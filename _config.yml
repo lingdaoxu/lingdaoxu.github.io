@@ -8,7 +8,7 @@ subtitle: 初九，潜龙勿用
 description:
 keywords:
 author: 道墟
-language:
+language: zh-Hans
 timezone:
 
 # URL
@@ -73,7 +73,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: maupassant
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
