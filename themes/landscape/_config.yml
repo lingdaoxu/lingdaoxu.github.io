@@ -8,6 +8,13 @@ rss: /atom.xml
 excerpt_link: Read More
 fancybox: true
 
+# Table Of Contents in the Sidebar
+toc:
+  enable: true
+
+  # Automatically add list number to toc.
+  number: true
+
 # Sidebar
 sidebar: right
 widgets:
