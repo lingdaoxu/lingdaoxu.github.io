@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文源码所在文件\system\core\init\init.cpp  一.概述Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是一个守护进程。 在介绍Init进程前先简单的介绍下Android的启动过程 1.1 bootloader引导1.1.1 什么是bootloader引导当我们按下手机的电源键时，最先运行的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Init进程">
+<meta property="og:url" content="http://yoursite.com/2018/05/31/Init进程/index.html">
+<meta property="og:site_name" content="道墟">
+<meta property="og:description" content="本文源码所在文件\system\core\init\init.cpp  一.概述Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是一个守护进程。 在介绍Init进程前先简单的介绍下Android的启动过程 1.1 bootloader引导1.1.1 什么是bootloader引导当我们按下手机的电源键时，最先运行的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-05-31T09:31:51.410Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Init进程">
+<meta name="twitter:description" content="本文源码所在文件\system\core\init\init.cpp  一.概述Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是一个守护进程。 在介绍Init进程前先简单的介绍下Android的启动过程 1.1 bootloader引导1.1.1 什么是bootloader引导当我们按下手机的电源键时，最先运行的">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/31/Init进程/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Init进程 | 道墟</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">道墟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">初九，潜龙勿用</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/31/Init进程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="道墟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道墟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Init进程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+
+              
+                
+              
+
+              <time title="Post created: 2018-05-31 14:32:19 / Updated at: 17:31:51" itemprop="dateCreated datePublished" datetime="2018-05-31T14:32:19+08:00">2018-05-31</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>本文源码所在文件<br>\system\core\init\init.cpp</p>
+</blockquote>
+<h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一.概述"></a>一.概述</h1><p>Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是<strong>一个守护进程</strong>。</p>
+<p>在介绍Init进程前先简单的介绍下Android的启动过程</p>
+<h1 id="1-1-bootloader引导"><a href="#1-1-bootloader引导" class="headerlink" title="1.1 bootloader引导"></a>1.1 bootloader引导</h1><h1 id="1-1-1-什么是bootloader引导"><a href="#1-1-1-什么是bootloader引导" class="headerlink" title="1.1.1 什么是bootloader引导"></a>1.1.1 什么是bootloader引导</h1><p>当我们按下手机的电源键时，最先运行的就是bootloader.bootloader主要作用就是初始化基本的硬件设备（CPU,内存，Flash等）并且通过建立内存空间的映射，为装载linux内核准备好适合的环境。内核装载完毕，bootloader将会从内存中清除。</p>
+<h1 id="1-1-2-Fastboot模式"><a href="#1-1-2-Fastboot模式" class="headerlink" title="1.1.2 Fastboot模式"></a>1.1.2 Fastboot模式</h1><p>Fastboot是Android设计的一套通过usb来更新手机分区映像的协议。</p>
+<h1 id="1-1-3-Recovery模式"><a href="#1-1-3-Recovery模式" class="headerlink" title="1.1.3 Recovery模式"></a>1.1.3 Recovery模式</h1><p>Android特有的升级系统。利用该模式可以进行恢复出厂设置，执行ota、补丁和固件升级。进入到Recovery模式实际上就是进入了一个文字模式的Linux</p>
+<h1 id="1-2-装载和启动Linux内核"><a href="#1-2-装载和启动Linux内核" class="headerlink" title="1.2 装载和启动Linux内核"></a>1.2 装载和启动Linux内核</h1><p>Android的boot.img存放的就是Linux的内核和一个根文件系统。上面的bootloader会把boot.img映像装载进内存。然后Linux内核会执行整个系统的初始化，完成整个后装载整个根文件系统，最后启动Init进程</p>
+<blockquote>
+<p>什么是根文件系统？<br>根文件系统是Linux系统一种特殊的文件系统，Android是基于Linux的，当然也有根文件系统。android的根文件系统是基于busybox实现的。</p>
+</blockquote>
+<h1 id="1-3-启动android系统"><a href="#1-3-启动android系统" class="headerlink" title="1.3 启动android系统"></a>1.3 启动android系统</h1><p>android系统的启动可以更加详细的分为以下几个阶段</p>
+<h1 id="1-3-1-启动Init进程"><a href="#1-3-1-启动Init进程" class="headerlink" title="1.3.1 启动Init进程"></a>1.3.1 启动Init进程</h1><p>Init进程是系统启动的<strong>第一个进程</strong>。在Init的启动过程中会解析Linux的配置脚本init.rc文件。解析init.rc文件，init进程会加载android的<strong>文件系统</strong>、<strong>创建系统目录</strong>、<strong>初始化属性系统</strong>、<strong>启动android系统重要的守护进程</strong>（USB守护进程、adb守护进程、vold守护进程、rild守护进程）。</p>
+<p>Init作为守护进程的作用：修改属性请求、重启崩溃的进程等操作。</p>
+<h1 id="1-3-2-启动ServiceManager"><a href="#1-3-2-启动ServiceManager" class="headerlink" title="1.3.2 启动ServiceManager"></a>1.3.2 启动ServiceManager</h1><p>由init启动。管理binder服务，负责binder的注册和查找。</p>
+<h1 id="1-3-3-启动Zygote进程"><a href="#1-3-3-启动Zygote进程" class="headerlink" title="1.3.3 启动Zygote进程"></a>1.3.3 启动Zygote进程</h1><p>Init进程初始化结束时会启动Zygote进程。Zygote进程负责fork应用进程。是所有应用进程的父进程。</p>
+<p>Zygote进程初始化时会创建Dalivik虚拟机、预装载系统的资源文件和Java类。从Zygote中fork的进程都会继承和共享这些预加载的资源。</p>
+<p>启动结束后，转为守护进程来响应应用建立的请求。</p>
+<h1 id="1-3-4-启动SystemService"><a href="#1-3-4-启动SystemService" class="headerlink" title="1.3.4 启动SystemService"></a>1.3.4 启动SystemService</h1><p>SystemService是Zygote进程fork的第一个进程，也是android系统的核心进程。在SystemService中运行这android大部分的binder服务。</p>
+<p>首先会启动SensorService,接着是ActivityManagerService（AMS）,WindowsManagerService（WMS）,PackagerManagerService(PKMS)等服务。</p>
+<h1 id="1-3-5-启动Launcher"><a href="#1-3-5-启动Launcher" class="headerlink" title="1.3.5 启动Launcher"></a>1.3.5 启动Launcher</h1><p>SystemServer加载完所有的服务后，最后会调用AMS中的systemReady()方法。在这个方法的执行过程中会发出Intent(android.intent.category.Home).凡是响应这个Intent的应用都会启动起来（这个流程我们到时候在AMS的分析部分会重点追踪整个过程），这边要跟开机广播区别开来。</p>
+<h1 id="二-Init进程的初始化过程"><a href="#二-Init进程的初始化过程" class="headerlink" title="二.Init进程的初始化过程"></a>二.Init进程的初始化过程</h1><p>Init进程的源码位于\system\core\init\下。程序的入口函数main()位于init.cpp中。</p>
+<h1 id="2-1-main函数的流程"><a href="#2-1-main函数的流程" class="headerlink" title="2.1 main函数的流程"></a>2.1 main函数的流程</h1><h1 id="2-1-1-选择启动程序"><a href="#2-1-1-选择启动程序" class="headerlink" title="2.1.1 选择启动程序"></a>2.1.1 选择启动程序</h1><p>因为Init和ueventd和watchdogd守护进程的代码存在大量的代码重合，所以直接合并到一个文件中，通过参数来判断执行那个守护进程。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">strcmp</span>(basename(argv[<span class="number">0</span>]), <span class="string">"ueventd"</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> ueventd_main(argc, argv);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">strcmp</span>(basename(argv[<span class="number">0</span>]), <span class="string">"watchdogd"</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> watchdogd_main(argc, argv);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="2-1-2-设置进程创建的文件的属性"><a href="#2-1-2-设置进程创建的文件的属性" class="headerlink" title="2.1.2 设置进程创建的文件的属性"></a>2.1.2 设置进程创建的文件的属性</h1><p><strong>缺省情况下一个进程创建的文件属性是022</strong>，使用umask可以设置文件属性的掩码。参数为0表示掩码为0777。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Clear the umask.</span></span><br><span class="line">umask(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<h1 id="2-1-3-创建目录和挂载文件系统"><a href="#2-1-3-创建目录和挂载文件系统" class="headerlink" title="2.1.3 创建目录和挂载文件系统"></a>2.1.3 创建目录和挂载文件系统</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//确保只执行一次</span></span><br><span class="line"><span class="keyword">bool</span> is_first_stage = (argc == <span class="number">1</span>) || (<span class="built_in">strcmp</span>(argv[<span class="number">1</span>], <span class="string">"--second-stage"</span>) != <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get the basic filesystem setup we need put together in the initramdisk</span></span><br><span class="line"><span class="comment">// on / and then we'll let the rc file figure out the rest.</span></span><br><span class="line"><span class="keyword">if</span> (is_first_stage) &#123;</span><br><span class="line">    mount(<span class="string">"tmpfs"</span>, <span class="string">"/dev"</span>, <span class="string">"tmpfs"</span>, MS_NOSUID, <span class="string">"mode=0755"</span>);</span><br><span class="line">    mkdir(<span class="string">"/dev/pts"</span>, <span class="number">0755</span>);</span><br><span class="line">    mkdir(<span class="string">"/dev/socket"</span>, <span class="number">0755</span>);</span><br><span class="line">    mount(<span class="string">"devpts"</span>, <span class="string">"/dev/pts"</span>, <span class="string">"devpts"</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">    mount(<span class="string">"proc"</span>, <span class="string">"/proc"</span>, <span class="string">"proc"</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">    mount(<span class="string">"sysfs"</span>, <span class="string">"/sys"</span>, <span class="string">"sysfs"</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>tmpfs是一种基于内存的文件系统，mount后就可以使用。tmpfs文件系统下的所有文件都存放在内存中，访问速度快，但是关机后会消失，适合用来存放临时性的文件。而且tmpfs文件系统的大小是动态变化的，一开始很小，随着文件的增多会随之变大。从上面的代码我们可以看到Android系统将tmpfs文件系统挂载到/dev目录下，而这个目录是用来保存系统创造的设备节点，正好符合tmpfs的特点。</p>
+<p>devpts是虚拟终端文件系统，通常mount在目录/dev/pts下。</p>
+<h1 id="2-1-4-初始化log系统"><a href="#2-1-4-初始化log系统" class="headerlink" title="2.1.4 初始化log系统"></a>2.1.4 初始化log系统</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将标准输入、输出、错误重定向到空设备文件/dev/null下，这是守护进程常用的手段</span></span><br><span class="line">   open_devnull_stdio();</span><br><span class="line"></span><br><span class="line"><span class="comment">//创建设备节点/dev/kmsg,这样init进程就可以使用kernel的log系统，之所以是用使用kernel的log系统是因为这时候android层的log系统还没有启动起来</span></span><br><span class="line">   klog_init();</span><br><span class="line"></span><br><span class="line"><span class="comment">//设置log级别</span></span><br><span class="line">   klog_set_level(KLOG_NOTICE_LEVEL);</span><br><span class="line"></span><br><span class="line"><span class="comment">//打印init进程开始启动的日志</span></span><br><span class="line">   NOTICE(<span class="string">"init%s started!\n"</span>, is_first_stage ? <span class="string">""</span> : <span class="string">" second stage"</span>);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>日志输出级别的宏定义如下<br> KLOG_ERROR_LEVEL 3<br> KLOG_WARNING_LEVEL 4<br> KLOG_NOTICE_LEVEL 5<br> KLOG_INFO_LEVEL 6<br> KLOG_DEBUG_LEVEL 7<br> KLOG_DEFAULT_LEVEL 3 //默认为3<br>当我们设置的级别低于5的时候会输出到 kernel log 中</p>
+</blockquote>
+<h1 id="2-2-启动Service进程"><a href="#2-2-启动Service进程" class="headerlink" title="2.2 启动Service进程"></a>2.2 启动Service进程</h1>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/30/android6.0/PKMS/开机应用扫描流程/" rel="next" title="开机应用扫描流程">
+                <i class="fa fa-chevron-left"></i> 开机应用扫描流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="道墟" />
+            
+              <p class="site-author-name" itemprop="name">道墟</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">Artikel</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">Kategorien</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">Tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一-概述"><span class="nav-text">一.概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-1-bootloader引导"><span class="nav-text">1.1 bootloader引导</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-1-1-什么是bootloader引导"><span class="nav-text">1.1.1 什么是bootloader引导</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-1-2-Fastboot模式"><span class="nav-text">1.1.2 Fastboot模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-1-3-Recovery模式"><span class="nav-text">1.1.3 Recovery模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-2-装载和启动Linux内核"><span class="nav-text">1.2 装载和启动Linux内核</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-启动android系统"><span class="nav-text">1.3 启动android系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-1-启动Init进程"><span class="nav-text">1.3.1 启动Init进程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-2-启动ServiceManager"><span class="nav-text">1.3.2 启动ServiceManager</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-3-启动Zygote进程"><span class="nav-text">1.3.3 启动Zygote进程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-4-启动SystemService"><span class="nav-text">1.3.4 启动SystemService</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-5-启动Launcher"><span class="nav-text">1.3.5 启动Launcher</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二-Init进程的初始化过程"><span class="nav-text">二.Init进程的初始化过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-main函数的流程"><span class="nav-text">2.1 main函数的流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-1-选择启动程序"><span class="nav-text">2.1.1 选择启动程序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-2-设置进程创建的文件的属性"><span class="nav-text">2.1.2 设置进程创建的文件的属性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-3-创建目录和挂载文件系统"><span class="nav-text">2.1.3 创建目录和挂载文件系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-4-初始化log系统"><span class="nav-text">2.1.4 初始化log系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-启动Service进程"><span class="nav-text">2.2 启动Service进程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">道墟</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
