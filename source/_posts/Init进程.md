@@ -3,16 +3,13 @@ author: 道墟
 date: 2018-05-31 14:32:19
 tags:
 ---
-本文源码所在文件:\system\core\init\init.cpp
-
-
 # 一.概述
 Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是**一个守护进程**。
 
 在介绍Init进程前先简单的介绍下Android的启动过程
 # 1.1 bootloader引导
 # 1.1.1 什么是bootloader引导
-当我们按下手机的电源键时，最先运行的就是bootloader.bootloader主要作用就是初始化基本的硬件设备（CPU,内存，Flash等）并且通过建立内存空间的映射，为装载linux内核准备好适合的环境。内核装载完毕，bootloader将会从内存中清除。
+当我们按下手机的电源键时，最先运行的就是bootloader。bootloader主要作用就是初始化基本的硬件设备（CPU,内存，Flash等）并且通过建立内存空间的映射，为装载linux内核准备好适合的环境。内核装载完毕，bootloader将会从内存中清除。
 
 # 1.1.2 Fastboot模式
 Fastboot是Android设计的一套通过usb来更新手机分区映像的协议。
@@ -32,7 +29,7 @@ Android的boot.img存放的就是Linux的内核和一个根文件系统。上面
 android系统的启动可以更加详细的分为以下几个阶段
 
 # 1.3.1 启动Init进程
-Init进程是系统启动的**第一个进程**。在Init的启动过程中会解析Linux的配置脚本init.rc文件。解析init.rc文件，init进程会加载android的**文件系统**、**创建系统目录**、**初始化属性系统**、**启动android系统重要的守护进程**（USB守护进程、adb守护进程、vold守护进程、rild守护进程）。
+Init进程是系统启动的**第一个进程**。在Init的启动过程中会解析Linux的配置脚本init.rc文件、加载android的**文件系统**、**创建系统目录**、**初始化属性系统**、**启动android系统重要的守护进程**（USB守护进程、adb守护进程、vold守护进程、rild守护进程）。
 
 Init作为守护进程的作用：修改属性请求、重启崩溃的进程等操作。
 
@@ -224,6 +221,7 @@ persist.sys.usb.config=adb
 
 ```
 # 2.1.9 启动属性服务（sockect）
+读取相应文件的属性，下文5.3中有介绍。
 ```cpp
     start_property_service();
 ```
@@ -551,18 +549,350 @@ static void restart_service_if_needed(struct service *svc) {
 
 # 3.1 init.rc文件格式
 
-# 3.2 init脚本的关键字定义
+init.rc文件是以块为单位，主要分为两类：一是行为:action,以on开头;二是服务:service，以service开头。注释以#开头。
+无论是action还是service的执行顺序都不是以文件中的编排顺序执行的，执行与否和是否执行都是Init进程中决定的。
 
-# 3.3 脚本文件解析过程
+# 3.1.1 action
+在on后面紧跟的字符串是action的触发器，触发器后面的是命令列表，每一行都是一个命令。可以通过 trigger 触发器字符串（trigger late-init） 来触发。
 
-# 3.4 init中启动的守护进程
-
-
-
-
-
-
-
-
+触发器几种类别
+- on early-init; 在初始化早期阶段触发；
+- on init; 在初始化阶段触发；
+- on late-init; 在初始化晚期阶段触发；
+- on boot/charger： 当系统启动/充电时触发，还包含其他情况，此处不一一列举；
+- on property:<key>=<value>: 当属性值满足条件时触发；
 
 
+```
+on property:sys.boot_from_charger_mode=1
+    class_stop charger
+    trigger late-init
+
+# Load properties from /system/ + /factory after fs mount.
+on load_system_props_action
+    load_system_props
+
+on load_persist_props_action
+    load_persist_props
+    start logd
+    start logd-reinit
+```
+
+
+# 3.1.2 service
+在service后面是服务的名称，我们可以使用“start”命令加服务名称来启动一个服务（start logd）。名称后面的则是执行文件路径和执行参数。然后下面的行称为选项，每一行都是一个选项。例如class表示服务的类别，我们可以通过class_start来一次性启动一组服务。
+```
+service ueventd /sbin/ueventd
+    class core
+    critical
+    seclabel u:r:ueventd:s0
+
+service logd /system/bin/logd
+    class core
+    socket logd stream 0666 logd logd
+    socket logdr seqpacket 0666 logd logd
+    socket logdw dgram 0222 logd logd
+    group root system
+     writepid /dev/cpuset/system-background/tasks
+
+service logd-reinit /system/bin/logd --reinit
+    oneshot
+    writepid /dev/cpuset/system-background/tasks
+    disabled
+
+service healthd /sbin/healthd
+    class core
+    critical
+    seclabel u:r:healthd:s0
+    group root system
+
+service console /system/bin/sh
+    class core
+    console
+    disabled
+    user shell
+    group shell log
+    seclabel u:r:shell:s0
+```
+# 3.1.3 Options 选项
+选项是service的修订项，它决定了服务何时运行以及怎么运行。
+
+
+- disabled: 表示不能通过触发器来触发，只能根据start service名开启动；
+
+- oneshot: service退出后不再重启；
+
+- user/group： 设置执行服务的用户/用户组，默认都是root；
+
+- class：设置所属的类名，当所属类启动/退出时，服务也启动/停止，默认为default；
+
+- onrestart:当服务重启时执行相应命令；
+
+- socket: 创建名为/dev/socket/<name>的socket，并把**文件描述符**传递给要启动的进程。
+
+- critical:这是一个关键服务，如果在4分钟内重启启动4次，则系统会重启并进入Recovery模式。
+
+# 3.1.4 Commands 命令
+
+- class_start <service_class_name>： 启动属于同一个class的所有服务；
+
+- start <service_name>： 启动指定的服务，若已启动则跳过；
+
+- stop <service_name>： 停止正在运行的服务
+
+- setprop <name> <value>：设置属性值
+
+- mkdir <path>：创建指定目录
+
+- symlink <target> <sym_link>： 创建连接到<target>的<sym_link>符号链接；
+
+- write <path> <string>： 向文件path中写入字符串；
+
+- exec： fork并执行，会阻塞init进程直到程序完毕；
+
+- exprot <name> <name>：设定环境变量；
+
+- loglevel <level>：设置log级别
+
+commands的命令远不止上面这些，这里只是列出一些常用的命令。
+
+# 3.2 脚本文件解析过程
+下面我们来追踪下脚本文件的解析过程
+
+> 源码所在文件路径如下
+\system\core\init\init_parser.cpp
+
+
+首先从入口函数开始
+
+```cpp
+int init_parse_config_file(const char* path) {
+    INFO("Parsing %s...\n", path);
+    Timer t;
+    std::string data;
+    if (!read_file(path, &data)) {
+        return -1;
+    }
+
+    data.push_back('\n'); // TODO: fix parse_config.
+    parse_config(path, data);
+    dump_parser_state();
+
+    NOTICE("(Parsing %s took %.2fs.)\n", path, t.duration());
+    return 0;
+}
+```
+从上面的函数可以看出来，首先通过read_file将文件的内容读到内存中，然后再通过parse_config函数进行解析。下面我们继续来追踪parse_config的方法：
+
+```cpp
+static void parse_config(const char *fn, const std::string& data)
+{
+    struct listnode import_list;
+    struct listnode *node;
+    char *args[INIT_PARSER_MAXARGS];
+
+    int nargs = 0;
+
+    parse_state state;
+    state.filename = fn;
+    state.line = 0;
+    state.ptr = strdup(data.c_str());  // TODO: fix this code!
+    state.nexttoken = 0;
+    state.parse_line = parse_line_no_op;
+
+    list_init(&import_list);
+    state.priv = &import_list;
+
+    for (;;) {
+        switch (next_token(&state)) {
+		//如果是结束标识符，则跳转到下面的parser_done位置
+        case T_EOF:
+            state.parse_line(&state, 0, 0);
+            goto parser_done;
+		
+		//行结束符
+        case T_NEWLINE:
+            state.line++;
+            if (nargs) {
+                int kw = lookup_keyword(args[0]);
+				//判断是否是section：关键字 on service import
+                if (kw_is(kw, SECTION)) {
+                    state.parse_line(&state, 0, 0);
+					//具体处理见 3.2.1 
+                    parse_new_section(&state, kw, nargs, args);
+                } else {
+					//当作当前section所属行处理
+                    state.parse_line(&state, nargs, args);
+                }
+                nargs = 0;
+            }
+            break;
+		//单词结束符 则先放入到数组中
+        case T_TEXT:
+            if (nargs < INIT_PARSER_MAXARGS) {
+                args[nargs++] = state.text;
+            }
+            break;
+        }
+    }
+
+parser_done:
+    list_for_each(node, &import_list) {
+         struct import *import = node_to_item(node, struct import, list);
+         int ret;
+
+         ret = init_parse_config_file(import->filename);
+         if (ret)
+             ERROR("could not import file '%s' from '%s'\n",
+                   import->filename, fn);
+    }
+}
+```
+
+
+parse_new_section方法追踪
+
+```cpp
+static void parse_new_section(struct parse_state *state, int kw,
+                       int nargs, char **args)
+{
+    printf("[ %s %s ]\n", args[0],
+           nargs > 1 ? args[1] : "");
+    switch(kw) {
+    case K_service:
+        state->context = parse_service(state, nargs, args);
+        if (state->context) {
+            state->parse_line = parse_line_service;
+            return;
+        }
+        break;
+    case K_on:
+        state->context = parse_action(state, nargs, args);
+        if (state->context) {
+            state->parse_line = parse_line_action;
+            return;
+        }
+        break;
+    case K_import:
+        parse_import(state, nargs, args);
+        break;
+    }
+    state->parse_line = parse_line_no_op;
+}
+```
+由上面的函数可以看出，该方法通过传入的参数kw来决定用什么方法来处理：
+
+- on关键字：parse_action
+- service关键字：parse_service
+- import关键字：parse_action
+
+然后我们可以看出上面对结构体state的parse_line字段分别进行赋值了方法地址,该方法用来解析命令行。
+
+- on关键字：parse_line_action
+- service关键字：parse_line_service
+
+
+# 3.3 执行action
+
+3.2的解析过程只是将init.rc中的action和service添加到各自的列表中。真正将它们添加到执行列表的还是在init进程中处理的。上文2.1.11 中在init的初始化过程通过action_for_each_trigger将action添加到action_queue中。
+
+```cpp
+void action_for_each_trigger(const char *trigger,
+                             void (*func)(struct action *act))
+{
+    struct listnode *node, *node2;
+    struct action *act;
+    struct trigger *cur_trigger;
+
+    list_for_each(node, &action_list) {
+        act = node_to_item(node, struct action, alist);
+        list_for_each(node2, &act->triggers) {
+            cur_trigger = node_to_item(node2, struct trigger, nlist);
+            if (!strcmp(cur_trigger->name, trigger)) {
+                func(act);
+            }
+        }
+    }
+}
+```
+
+# 四.Init进程对信号的处理
+
+# 4.1 僵尸进程
+
+当一个进程退出exit()时，会向它的父进程发送一个SIGCHLD信号。父进程收到该信号后，会释放分配给该子进程的系统资源；并且父进程需要调用wait()或waitpid()等待子进程结束。
+
+如果父进程没有做这种处理，且父进程初始化时也没有调用signal(SIGCHLD, SIG_IGN)来显示忽略对SIGCHLD的处理，这时子进程将一直保持当前的退出状态，不会完全退出。这样的子进程不能被调度，所做的只是在进程列表中占据一个位置，保存了该进程的PID、终止状态、CPU使用时间等信息；我们将这种进程称为“Zombie”进程，即僵尸进程。
+
+android中查看僵尸进程的方法是通过 adb shell ps来查看的，僵尸进程的的进程状态为“Z”。
+
+
+由于僵尸进程仍会在进程列表中占据一个位置，而Linux所支持的最大进程数量是有限的；超过这个界限值后，我们就无法创建进程。所以，我们有必要清理那些僵尸进程，以保证系统的正常运作。
+
+# 4.2 处理过程
+
+待补充
+
+# 五. 属性系统
+
+# 5.1 属性系统介绍
+android的属性用来保存系统设置和进程间传递一些信息。每个属性由属性名称和属性值组成，名称通常以“."分割,这些名称的前缀有特殊的含义，不能随便改动。属性值只能是字符串。
+
+对于进程来说，读取属性值是没有限制的，任何进程都可以读取属性值。但是写属性值只能通过init进程进行，而且init进程还会检查请求的进程是否具有该权限（5.0以后只在）。当属性值修改成功后，init进程会init.rc中是否有跟该属性修改值相匹配的“触发器”。如果有则执行触发器下的命令。
+
+前缀分类
+
+- “ro.”：表示只读属性，一旦设置则不能改变。
+
+- “persist”:表示属性值会被写入目录/data/property下与属性同名的文件中。下次开机init进程会从中读取值。所以这边设置的值是永久生效的。
+
+- “ctl”:表示控制信息，用来执行一些命令：ctl.start、ctl.stop、ctl.restart
+	- setprop ctl.start bootanim：查看开机动画
+	- setprop ctl.stop bootanim：关闭开机动画
+	- setprop ctl.start pre-recovery：进入recovery模式
+
+# 5.2 创建属性系统的共享空间
+在上面Init进程的初始化函数中我们调用了property_init函数为属性系统创建了一块共享内存区域。这块区域只能由init进程进行写入，读则不限制。
+
+```cpp
+void property_init() {
+	//防止多次初始化
+    if (property_area_initialized) {
+        return;
+    }
+
+    property_area_initialized = true;
+	
+	//创建和初始化属性的共享内存空间，这块内存空间由/dev/__properties__ 设备创建,这块空间的文件描述符保存在
+	//static workspace pa_workspace; 中，最后在service_start的时候保存到环境变量中
+    if (__system_property_area_init()) {
+        return;
+    }
+
+    pa_workspace.size = 0;
+    pa_workspace.fd = open(PROP_FILENAME, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+    if (pa_workspace.fd == -1) {
+        ERROR("Failed to open %s: %s\n", PROP_FILENAME, strerror(errno));
+        return;
+    }
+}
+```
+
+# 5.3 初始化属性系统的值
+通过从以下文件中读取值进行初始化
+
+/system/build.prop：定了系统初始和永久的一些属性
+/data/local.prop：这个则需要和ro.debuggable配合使用，如果这个值为1，那么从该文件中读取值覆盖系统缺省的属性值，之所有有这个设计是为了方便开发人员调试，因为/system/build.prop 是在根目录下的。
+/data/property：该目录下的文件读取出来写入到属性值中。
+/default.prop: Init进程初始化过程中调用property_load_boot_defaults函数读取的
+
+
+
+
+
+# 源码地址
+> 本文源码基于android6.0 
+system\core\init\init.cpp
+system\core\init\init_parser.cpp
+system\core\init\signal_handler.cpp
+system\core\init\property_service.cpp
