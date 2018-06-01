@@ -281,6 +281,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/01/Zygote/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="道墟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道墟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/01/Zygote/" itemprop="url">
+                  Zygote进程
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+
+              
+                
+              
+
+              <time title="Post created: 2018-06-01 16:21:17 / Updated at: 17:58:36" itemprop="dateCreated datePublished" datetime="2018-06-01T16:21:17+08:00">2018-06-01</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          一.概述1.1 什么是ZygoteLinux的进程是通过系统调用fork产生的，fork出的子进程除了内核中的一些核心数据结构和父进程不同外，其余的内存映像都是和父进程共享的。当子进程需要去改写这些共享数据的内存时，操作系统才会为子进程分配一个新的内存页，并将老的页面数据复制到新的页面上后再进行修改
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/01/Zygote/#more" rel="contents">
+              Weiterlesen &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/31/Init进程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -344,7 +490,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Updated at: 2018-06-01 11:47:12" itemprop="dateModified" datetime="2018-06-01T11:47:12+08:00">2018-06-01</time>
+                <time title="Updated at: 2018-06-01 16:06:14" itemprop="dateModified" datetime="2018-06-01T16:06:14+08:00">2018-06-01</time>
               
             
           </span>
@@ -379,10 +525,9 @@
       
         
           
-          
-本文源码所在文件\system\core\init\init.cpp\system\core\init\init_parser.cpp\system\core\init\signal_handler.cpp
-
-一.概述Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的
+          一.概述Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是一个守护进程。
+在介绍Init进程前先简单的介绍下Android的启动过程
+1.1 bootloader引导1.1.1 什么是bootloader引导当我们按下
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -871,7 +1016,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Updated at: 2018-05-31 08:54:07" itemprop="dateModified" datetime="2018-05-31T08:54:07+08:00">2018-05-31</time>
+                <time title="Updated at: 2018-06-01 15:29:21" itemprop="dateModified" datetime="2018-06-01T15:29:21+08:00">2018-06-01</time>
               
             
           </span>
@@ -1023,7 +1168,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-count">5</span>
                     <span class="site-state-item-name">Artikel</span>
                   </a>
                 </div>
