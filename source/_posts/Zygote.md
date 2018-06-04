@@ -1,7 +1,8 @@
 title: Zygote进程
 author: 道墟
-date: 2018-06-01 16:21:17
-tags:
+tags: []
+categories: []
+date: 2018-06-01 16:21:00
 ---
 # 一.概述
 
@@ -452,6 +453,7 @@ AndroidRuntime::AndroidRuntime(char* argBlockStart, const size_t argBlockLength)
 				
 			//装在系统资源。包括系统预加载类、Framework资源和openGL的资源。
 			//这样当应用程序被fork处理后，应用的进程内已经很包含了这些系统资源，大大节省应用的启动时间。
+			//在 第四节 预加载系统类和资源中会详细介绍
             preload();
 			
             EventLog.writeEvent(LOG_BOOT_PROGRESS_PRELOAD_END,
@@ -468,7 +470,7 @@ AndroidRuntime::AndroidRuntime(char* argBlockStart, const size_t argBlockLength)
             Trace.setTracingEnabled(false);
 
             if (startSystemServer) {
-				//启动 SystemServer进程
+						//启动 SystemServer进程 在中会详细介绍
                 startSystemServer(abiList, socketName);
             }
 
@@ -486,6 +488,8 @@ AndroidRuntime::AndroidRuntime(char* argBlockStart, const size_t argBlockLength)
         }
     }
 ```
+{% post_link SystemServer服务 %} 的启动也是在这边的startSystemServer()方法中调用的。
+
 
 # 三.Zygote启动应用程序
 
@@ -1165,33 +1169,20 @@ invokeWith不为null的时候，将会通过调用exec的方式来启动app_proc
 ```
 
 # 四.预加载系统类和资源
+在 2.3 节 ZygoteInit类的main方法中会调用 preload 方法来可进行系统类和资源的预加载。
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```java
+    static void preload() {
+        Log.d(TAG, "begin preload");
+        preloadClasses();
+        preloadResources();
+        preloadOpenGL();
+        preloadSharedLibraries();
+        preloadTextResources();
+        // Ask the WebViewFactory to do any initialization that must run in the zygote process,
+        // for memory sharing purposes.
+        WebViewFactory.prepareWebViewInZygote();
+        Log.d(TAG, "end preload");
+    }
+```
