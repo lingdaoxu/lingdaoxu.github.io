@@ -917,7 +917,7 @@ private static ProcessStartResult zygoteSendArgsAndGetResult(
 
             fd = null;
 			
-			//fork子进程 最后的fork还在native层完成的
+			//fork子进程 最后的fork还在native层完成的  在SystemServer进程 2.1 节会详细介绍
             pid = Zygote.forkAndSpecialize(parsedArgs.uid, parsedArgs.gid, parsedArgs.gids,
                     parsedArgs.debugFlags, rlimits, parsedArgs.mountExternal, parsedArgs.seInfo,
                     parsedArgs.niceName, fdsToClose, parsedArgs.instructionSet,
