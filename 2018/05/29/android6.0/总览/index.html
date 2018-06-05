@@ -116,7 +116,7 @@
 <meta property="og:site_name" content="道墟">
 <meta property="og:description" content="一.引言Android系统非常庞大、错综复杂，其底层是采用Linux作为基底，上层采用包含虚拟机的Java层以及Native层，通过系统调用(Syscall)连通系统的内核空间与用户空间。用户空间主要采用C++和Java代码，通过JNI技术打通用户空间的Java层和Native层(C++/C)，从而融为一体。 限于本人目前的只是水平,本系列的源码分析基本限于framework层的java代码。目前">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-01T07:29:21.324Z">
+<meta property="og:updated_time" content="2018-06-04T00:47:18.851Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="源码导航">
 <meta name="twitter:description" content="一.引言Android系统非常庞大、错综复杂，其底层是采用Linux作为基底，上层采用包含虚拟机的Java层以及Native层，通过系统调用(Syscall)连通系统的内核空间与用户空间。用户空间主要采用C++和Java代码，通过JNI技术打通用户空间的Java层和Native层(C++/C)，从而融为一体。 限于本人目前的只是水平,本系列的源码分析基本限于framework层的java代码。目前">
@@ -226,7 +226,7 @@
           
           <li class="menu-item menu-item-home">
     <a href="/" rel="section">
-      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
   </li>
         
         
@@ -234,7 +234,7 @@
           
           <li class="menu-item menu-item-archives">
     <a href="/archives/" rel="section">
-      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
   </li>
 
       
@@ -320,14 +320,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Veröffentlicht am</span>
+                <span class="post-meta-item-text">Posted on</span>
               
 
               
                 
               
 
-              <time title="Post created: 2018-05-29 13:37:00" itemprop="dateCreated datePublished" datetime="2018-05-29T13:37:00+08:00">2018-05-29</time>
+              <time title="Created: 2018-05-29 13:37:00" itemprop="dateCreated datePublished" datetime="2018-05-29T13:37:00+08:00">2018-05-29</time>
             
 
             
@@ -344,7 +344,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Updated at: 2018-06-01 15:29:21" itemprop="dateModified" datetime="2018-06-01T15:29:21+08:00">2018-06-01</time>
+                <time title="Modified: 2018-06-04 08:47:18" itemprop="dateModified" datetime="2018-06-04T08:47:18+08:00">2018-06-04</time>
               
             
           </span>
@@ -358,14 +358,14 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">in</span>
+                <span class="post-meta-item-text">In</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/android6-0/" itemprop="url" rel="index"><span itemprop="name">android6.0</span></a></span>
 
                 
                 
-                  . 
+                  , 
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/android6-0/导读/" itemprop="url" rel="index"><span itemprop="name">导读</span></a></span>
@@ -414,6 +414,7 @@
 </thead>
 <tbody>
 <tr>
+<td>Zygote进程</td>
 <td></td>
 </tr>
 </tbody>
@@ -551,10 +552,10 @@
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Inhaltsverzeichnis
+            Table of Contents
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Übersicht
+            Overview
           </li>
         </ul>
       
@@ -578,8 +579,8 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">5</span>
-                    <span class="site-state-item-name">Artikel</span>
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
               
@@ -602,7 +603,7 @@
                       
                     
                     <span class="site-state-item-count">5</span>
-                    <span class="site-state-item-name">Kategorien</span>
+                    <span class="site-state-item-name">categories</span>
                   </a>
                 </div>
               
@@ -619,7 +620,7 @@
                       
                     
                     <span class="site-state-item-count">2</span>
-                    <span class="site-state-item-name">Tags</span>
+                    <span class="site-state-item-name">tags</span>
                   </a>
                 </div>
               
@@ -688,7 +689,7 @@
 
 
 
-  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
 
 
 
