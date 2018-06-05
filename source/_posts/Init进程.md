@@ -1,7 +1,8 @@
 title: Init进程
 author: 道墟
 tags: []
-categories: []
+categories:
+  - android6.0
 date: 2018-05-31 14:32:00
 ---
 # 一.概述

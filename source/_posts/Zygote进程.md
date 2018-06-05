@@ -1,7 +1,8 @@
 title: Zygote进程
 author: 道墟
 tags: []
-categories: []
+categories:
+  - android6.0
 date: 2018-06-01 16:21:00
 ---
 # 一.概述
@@ -12,7 +13,7 @@ Linux的进程是通过系统调用fork产生的，fork出的子进程除了内�
 
 fork出来的进程会继续执行系统调用exec。exec将用一个新的可执行文件的内容替换当前进程的代码段、数据段、堆和栈段。
 
-fork+exec是Linux启动进程的标准做法，Init进程中启动的服务也是这样做的，Zygote进程就是这么被启动起来的。（{% post_link Init进程 %} 2.2.3处）
+fork+exec是Linux启动进程的标准做法，Init进程中启动的服务也是这样做的，Zygote进程就是这么被启动起来的。（ {% post_link Init进程 %}  2.2.3处）
 
 那么Zygote是怎么做的呢？Zygote在创建应用程序的只执行了fork操作，没有去调用exec。
 
