@@ -1,7 +1,10 @@
 title: '日常问题:动态广播无法唤起singtask模式下的activity'
 author: 道墟
-date: 2018-06-07 01:12:29
-tags:
+tags: []
+categories:
+  - 工作问题
+  - rk3228&rk3399
+date: 2018-06-07 01:12:00
 ---
 之前在AMS服务中我们有梳理过activity的启动过程，刚好今天同事反馈了一个app开发中遇到的问题跟activity的启动相关，这边记录下问题的梳理过程。
 问题简单描述：
