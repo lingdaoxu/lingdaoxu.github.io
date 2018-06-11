@@ -108,17 +108,17 @@
 
 
 
-  <meta name="description" content="一.概述SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（ 2.3节）。在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemServer中的服务代">
+  <meta name="description" content="一.概述SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（Zygote进程 2.3节）。在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemSer">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SystemServer服务">
 <meta property="og:url" content="http://yoursite.com/2018/06/04/SystemServer服务/index.html">
 <meta property="og:site_name" content="道墟">
-<meta property="og:description" content="一.概述SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（ 2.3节）。在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemServer中的服务代">
+<meta property="og:description" content="一.概述SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（Zygote进程 2.3节）。在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemSer">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-05T01:10:34.817Z">
+<meta property="og:updated_time" content="2018-06-06T01:04:38.215Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SystemServer服务">
-<meta name="twitter:description" content="一.概述SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（ 2.3节）。在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemServer中的服务代">
+<meta name="twitter:description" content="一.概述SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（Zygote进程 2.3节）。在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemSer">
 
 
 
@@ -225,7 +225,7 @@
           
           <li class="menu-item menu-item-home">
     <a href="/" rel="section">
-      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
   </li>
         
         
@@ -233,7 +233,7 @@
           
           <li class="menu-item menu-item-archives">
     <a href="/archives/" rel="section">
-      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
   </li>
 
       
@@ -319,14 +319,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">Veröffentlicht am</span>
               
 
               
                 
               
 
-              <time title="Created: 2018-06-04 09:53:03" itemprop="dateCreated datePublished" datetime="2018-06-04T09:53:03+08:00">2018-06-04</time>
+              <time title="Post created: 2018-06-04 09:53:00" itemprop="dateCreated datePublished" datetime="2018-06-04T09:53:00+08:00">2018-06-04</time>
             
 
             
@@ -343,11 +343,29 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-06-05 09:10:34" itemprop="dateModified" datetime="2018-06-05T09:10:34+08:00">2018-06-05</time>
+                <time title="Updated at: 2018-06-06 09:04:38" itemprop="dateModified" datetime="2018-06-06T09:04:38+08:00">2018-06-06</time>
               
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/android6-0/" itemprop="url" rel="index"><span itemprop="name">android6.0</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -376,7 +394,7 @@
       
 
       
-        <h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一.概述"></a>一.概述</h1><p>SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（ 2.3节）。<br>在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemServer中的服务代理访问。</p>
+        <h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一.概述"></a>一.概述</h1><p>SystemServer是Android系统的核心服务，大部分服务都运行在这个进程中，它通过Zygote进程启动,在ZygoteInit类中的main方法通过startSystemServer方法（<a href="/2018/06/01/Zygote进程/" title="Zygote进程">Zygote进程</a> 2.3节）。<br>在SystemServer中运行的服务有60多种，为了防止应用程序对系统造成破坏，android的应用程序没有权限直接访问设备的底层资源，只能通过SystemServer中的服务代理访问。</p>
 <h1 id="二-SystemServer-的创建过程"><a href="#二-SystemServer-的创建过程" class="headerlink" title="二.SystemServer 的创建过程"></a>二.SystemServer 的创建过程</h1><p>如上节所说的，SystemServer服务是在Zygote进程中fork并初始化的，然后再调用SystemServer的main方法来启动系统的服务。所以下面我们分成两个部分分别介绍走一遍流程。</p>
 <h1 id="2-1-创建SystemServer进程"><a href="#2-1-创建SystemServer进程" class="headerlink" title="2.1 创建SystemServer进程"></a>2.1 创建SystemServer进程</h1><p>首先我们来看 startSystemServer 方法。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">startSystemServer</span><span class="params">(String abiList, String socketName)</span></span></span><br><span class="line"><span class="function">          <span class="keyword">throws</span> MethodAndArgsCaller, RuntimeException </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">//1.准备启动参数</span></span><br><span class="line">      <span class="keyword">long</span> capabilities = posixCapabilitiesAsBits(</span><br><span class="line">          OsConstants.CAP_BLOCK_SUSPEND,</span><br><span class="line">          OsConstants.CAP_KILL,</span><br><span class="line">          OsConstants.CAP_NET_ADMIN,</span><br><span class="line">          OsConstants.CAP_NET_BIND_SERVICE,</span><br><span class="line">          OsConstants.CAP_NET_BROADCAST,</span><br><span class="line">          OsConstants.CAP_NET_RAW,</span><br><span class="line">          OsConstants.CAP_SYS_MODULE,</span><br><span class="line">          OsConstants.CAP_SYS_NICE,</span><br><span class="line">          OsConstants.CAP_SYS_RESOURCE,</span><br><span class="line">          OsConstants.CAP_SYS_TIME,</span><br><span class="line">          OsConstants.CAP_SYS_TTY_CONFIG</span><br><span class="line">      );</span><br><span class="line">      <span class="comment">/* Hardcoded command line to start the system server */</span></span><br><span class="line">      String args[] = &#123;</span><br><span class="line">          <span class="string">"--setuid=1000"</span>,    <span class="comment">//进程ID</span></span><br><span class="line">          <span class="string">"--setgid=1000"</span>,   <span class="comment">//组ID</span></span><br><span class="line">          <span class="string">"--setgroups=1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1018,1021,1032,3001,3002,3003,3006,3007"</span>,</span><br><span class="line">          <span class="string">"--capabilities="</span> + capabilities + <span class="string">","</span> + capabilities,</span><br><span class="line">          <span class="string">"--nice-name=system_server"</span>,</span><br><span class="line">          <span class="string">"--runtime-args"</span>,</span><br><span class="line">          <span class="string">"com.android.server.SystemServer"</span>,   <span class="comment">//设定了SystemServer的执行类</span></span><br><span class="line">      &#125;;</span><br><span class="line">      ZygoteConnection.Arguments parsedArgs = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">int</span> pid;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">          parsedArgs = <span class="keyword">new</span> ZygoteConnection.Arguments(args);</span><br><span class="line">          ZygoteConnection.applyDebuggerSystemProperty(parsedArgs);</span><br><span class="line">          ZygoteConnection.applyInvokeWithSystemProperty(parsedArgs);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//2.调用forkSystemServer fork出SystemServer进程</span></span><br><span class="line">          <span class="comment">/* Request to fork the system server process */</span></span><br><span class="line">          pid = Zygote.forkSystemServer(</span><br><span class="line">                  parsedArgs.uid, parsedArgs.gid,</span><br><span class="line">                  parsedArgs.gids,</span><br><span class="line">                  parsedArgs.debugFlags,</span><br><span class="line">                  <span class="keyword">null</span>,</span><br><span class="line">                  parsedArgs.permittedCapabilities,</span><br><span class="line">                  parsedArgs.effectiveCapabilities);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (IllegalArgumentException ex) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(ex);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/* For child process */</span></span><br><span class="line">      <span class="keyword">if</span> (pid == <span class="number">0</span>) &#123;</span><br><span class="line">          <span class="keyword">if</span> (hasSecondZygote(abiList)) &#123;</span><br><span class="line">              waitForSecondaryZygote(socketName);</span><br><span class="line">          &#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//3.初始化SystemServer进程</span></span><br><span class="line">          handleSystemServerProcess(parsedArgs);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
@@ -415,7 +433,7 @@
 </ul>
 <h1 id="2-2-1-createSystemContext-方法获取-Context"><a href="#2-2-1-createSystemContext-方法获取-Context" class="headerlink" title="2.2.1 createSystemContext 方法获取 Context"></a>2.2.1 createSystemContext 方法获取 Context</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createSystemContext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      ActivityThread activityThread = ActivityThread.systemMain();</span><br><span class="line">      mSystemContext = activityThread.getSystemContext();</span><br><span class="line"><span class="comment">//设置主题</span></span><br><span class="line">      mSystemContext.setTheme(android.R.style.Theme_DeviceDefault_Light_DarkActionBar);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ActivityThread <span class="title">systemMain</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// The system process on low-memory devices do not get to use hardware</span></span><br><span class="line">    <span class="comment">// accelerated drawing, since this can add too much overhead to the</span></span><br><span class="line">    <span class="comment">// process.</span></span><br><span class="line">    <span class="keyword">if</span> (!ActivityManager.isHighEndGfx()) &#123;</span><br><span class="line">        HardwareRenderer.disable(<span class="keyword">true</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        HardwareRenderer.enableForegroundTrimming();</span><br><span class="line">    &#125;</span><br><span class="line">    ActivityThread thread = <span class="keyword">new</span> ActivityThread();</span><br><span class="line">    thread.attach(<span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">return</span> thread;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在  篇的 3.5.3节中，当 zygote 进程fork应用进程，在最后启动应用的时候会调用 ActivityThread 类的 main 方法，跟这边的 systemMain方法相似的是这两个方法都 创建了 ActivityThread 对象（区别在于 普通应用 thread.attach(false); SystemServer则是 true）。ActivityThread 是应用程序的主线程类，那么为什么 SystemServer 需要创建这个对象呢？这是因为 SystemServer 不仅仅是一个后台进程，同时也是一个运行着组件的Service的进程，像一些系统对话框也是从这个进程弹出的，所以它也需要一个上下文环境（activityThread.getSystemContext()）。</p>
+<p>在 <a href="/2018/06/01/Zygote进程/" title="Zygote进程">Zygote进程</a> 篇的 3.5.3节中，当 zygote 进程fork应用进程，在最后启动应用的时候会调用 ActivityThread 类的 main 方法，跟这边的 systemMain方法相似的是这两个方法都 创建了 ActivityThread 对象（区别在于 普通应用 thread.attach(false); SystemServer则是 true）。ActivityThread 是应用程序的主线程类，那么为什么 SystemServer 需要创建这个对象呢？这是因为 SystemServer 不仅仅是一个后台进程，同时也是一个运行着组件的Service的进程，像一些系统对话框也是从这个进程弹出的，所以它也需要一个上下文环境（activityThread.getSystemContext()）。</p>
 <p>上文我们说到SystemServer 调用 hread.attach 方法的参数为 true ，那么我们来看看 true分支下的流程</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">attach</span><span class="params">(<span class="keyword">boolean</span> system)</span> </span>&#123;</span><br><span class="line">     sCurrentActivityThread = <span class="keyword">this</span>;</span><br><span class="line">     mSystemThread = system;</span><br><span class="line">     <span class="keyword">if</span> (!system) &#123;</span><br><span class="line">         ViewRootImpl.addFirstDrawHandler(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">             <span class="meta">@Override</span></span><br><span class="line">             <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                 ensureJitEnabled();</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;);</span><br><span class="line">         android.ddm.DdmHandleAppName.setAppName(<span class="string">"&lt;pre-initialized&gt;"</span>,</span><br><span class="line">                                                 UserHandle.myUserId());</span><br><span class="line">         RuntimeInit.setApplicationObject(mAppThread.asBinder());</span><br><span class="line">         <span class="keyword">final</span> IActivityManager mgr = ActivityManagerNative.getDefault();</span><br><span class="line">         <span class="keyword">try</span> &#123;</span><br><span class="line">             mgr.attachApplication(mAppThread);</span><br><span class="line">         &#125; <span class="keyword">catch</span> (RemoteException ex) &#123;</span><br><span class="line">             <span class="comment">// Ignore</span></span><br><span class="line">         &#125;</span><br><span class="line">         <span class="comment">// Watch for getting close to heap limit.</span></span><br><span class="line">         BinderInternal.addGcWatcher(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">             <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                 <span class="keyword">if</span> (!mSomeActivitiesChanged) &#123;</span><br><span class="line">                     <span class="keyword">return</span>;</span><br><span class="line">                 &#125;</span><br><span class="line">                 Runtime runtime = Runtime.getRuntime();</span><br><span class="line">                 <span class="keyword">long</span> dalvikMax = runtime.maxMemory();</span><br><span class="line">                 <span class="keyword">long</span> dalvikUsed = runtime.totalMemory() - runtime.freeMemory();</span><br><span class="line">                 <span class="keyword">if</span> (dalvikUsed &gt; ((<span class="number">3</span>*dalvikMax)/<span class="number">4</span>)) &#123;</span><br><span class="line">                     <span class="keyword">if</span> (DEBUG_MEMORY_TRIM) Slog.d(TAG, <span class="string">"Dalvik max="</span> + (dalvikMax/<span class="number">1024</span>)</span><br><span class="line">                             + <span class="string">" total="</span> + (runtime.totalMemory()/<span class="number">1024</span>)</span><br><span class="line">                             + <span class="string">" used="</span> + (dalvikUsed/<span class="number">1024</span>));</span><br><span class="line">                     mSomeActivitiesChanged = <span class="keyword">false</span>;</span><br><span class="line">                     <span class="keyword">try</span> &#123;</span><br><span class="line">                         mgr.releaseSomeActivities(mAppThread);</span><br><span class="line">                     &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                     &#125;</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;);</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;			<span class="comment">//这边为 true 流程 也就是 SystemServer 进程执行的 </span></span><br><span class="line">		</span><br><span class="line"><span class="comment">//设置ddms中看到的应用名称 这也是为什么 我们上面说要重启系统 杀死system_process进程的原因</span></span><br><span class="line">         <span class="comment">// Don't set application object here -- if the system crashes,</span></span><br><span class="line">         <span class="comment">// we can't display an alert, we just want to die die die.</span></span><br><span class="line">         android.ddm.DdmHandleAppName.setAppName(<span class="string">"system_process"</span>,</span><br><span class="line">                 UserHandle.myUserId());</span><br><span class="line">         <span class="keyword">try</span> &#123;</span><br><span class="line">	<span class="comment">//创建 Instrumentation 对象</span></span><br><span class="line">             mInstrumentation = <span class="keyword">new</span> Instrumentation();</span><br><span class="line">	<span class="comment">//创建 Context 对象</span></span><br><span class="line">             ContextImpl context = ContextImpl.createAppContext(</span><br><span class="line">                     <span class="keyword">this</span>, getSystemContext().mPackageInfo);</span><br><span class="line">	<span class="comment">//创建 应用的Application 对象</span></span><br><span class="line">             mInitialApplication = context.mPackageInfo.makeApplication(<span class="keyword">true</span>, <span class="keyword">null</span>);</span><br><span class="line">	<span class="comment">//调用 onCreate 生命周期</span></span><br><span class="line">             mInitialApplication.onCreate();</span><br><span class="line">         &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">             <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                     <span class="string">"Unable to instantiate Application():"</span> + e.toString(), e);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// add dropbox logging to libcore</span></span><br><span class="line">     DropBox.setReporter(<span class="keyword">new</span> DropBoxReporter());</span><br><span class="line"></span><br><span class="line">     ViewRootImpl.addConfigCallback(<span class="keyword">new</span> ComponentCallbacks2() &#123;</span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onConfigurationChanged</span><span class="params">(Configuration newConfig)</span> </span>&#123;</span><br><span class="line">             <span class="keyword">synchronized</span> (mResourcesManager) &#123;</span><br><span class="line">                 <span class="comment">// We need to apply this change to the resources</span></span><br><span class="line">                 <span class="comment">// immediately, because upon returning the view</span></span><br><span class="line">                 <span class="comment">// hierarchy will be informed about it.</span></span><br><span class="line">                 <span class="keyword">if</span> (mResourcesManager.applyConfigurationToResourcesLocked(newConfig, <span class="keyword">null</span>)) &#123;</span><br><span class="line">                     <span class="comment">// This actually changed the resources!  Tell</span></span><br><span class="line">                     <span class="comment">// everyone about it.</span></span><br><span class="line">                     <span class="keyword">if</span> (mPendingConfiguration == <span class="keyword">null</span> ||</span><br><span class="line">                             mPendingConfiguration.isOtherSeqNewer(newConfig)) &#123;</span><br><span class="line">                         mPendingConfiguration = newConfig;</span><br><span class="line"></span><br><span class="line">                         sendMessage(H.CONFIGURATION_CHANGED, newConfig);</span><br><span class="line">                     &#125;</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLowMemory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onTrimMemory</span><span class="params">(<span class="keyword">int</span> level)</span> </span>&#123;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 <p>从上面代码可以看出这是完全在模拟一个类似应用的环境。但是每一个上下文环境都需要一个 apk文件，那么这个文件从哪里来呢？这个就需要我们跟踪进 getSystemContext 方法了。</p>
@@ -450,7 +468,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/01/Zygote/" rel="next" title="Zygote进程">
+              <a href="/2018/06/01/Zygote进程/" rel="next" title="Zygote进程">
                 <i class="fa fa-chevron-left"></i> Zygote进程
               </a>
             
@@ -459,6 +477,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/05/Binder开篇/" rel="prev" title="Binder 开篇">
+                Binder 开篇 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -509,10 +531,10 @@
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
+            Inhaltsverzeichnis
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
+            Übersicht
           </li>
         </ul>
       
@@ -536,8 +558,8 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
-                    <span class="site-state-item-name">posts</span>
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">Artikel</span>
                   </a>
                 </div>
               
@@ -560,7 +582,7 @@
                       
                     
                     <span class="site-state-item-count">5</span>
-                    <span class="site-state-item-name">categories</span>
+                    <span class="site-state-item-name">Kategorien</span>
                   </a>
                 </div>
               
@@ -577,7 +599,7 @@
                       
                     
                     <span class="site-state-item-count">2</span>
-                    <span class="site-state-item-name">tags</span>
+                    <span class="site-state-item-name">Tags</span>
                   </a>
                 </div>
               
@@ -646,7 +668,7 @@
 
 
 
-  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
 
 
 

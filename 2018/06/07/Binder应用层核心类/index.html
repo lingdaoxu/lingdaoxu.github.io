@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一. 概述应用层核心类主要是指libbinder库里的 IInterface、BpInterface、BpInterface、BBinder、BPBinder和IBinder类。  源码位置：frameworks\native\libs\binderframeworks\native\include\binder  二.核心类解析2.1 IBinder.h文件1234567891011121314">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Binder应用层核心类">
+<meta property="og:url" content="http://yoursite.com/2018/06/07/Binder应用层核心类/index.html">
+<meta property="og:site_name" content="道墟">
+<meta property="og:description" content="一. 概述应用层核心类主要是指libbinder库里的 IInterface、BpInterface、BpInterface、BBinder、BPBinder和IBinder类。  源码位置：frameworks\native\libs\binderframeworks\native\include\binder  二.核心类解析2.1 IBinder.h文件1234567891011121314">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-07T07:51:08.760Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Binder应用层核心类">
+<meta name="twitter:description" content="一. 概述应用层核心类主要是指libbinder库里的 IInterface、BpInterface、BpInterface、BBinder、BPBinder和IBinder类。  源码位置：frameworks\native\libs\binderframeworks\native\include\binder  二.核心类解析2.1 IBinder.h文件1234567891011121314">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/07/Binder应用层核心类/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Binder应用层核心类 | 道墟</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">道墟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">初九，潜龙勿用</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/07/Binder应用层核心类/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="道墟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道墟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Binder应用层核心类
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+
+              
+                
+              
+
+              <time title="Post created: 2018-06-07 14:35:34 / Updated at: 15:51:08" itemprop="dateCreated datePublished" datetime="2018-06-07T14:35:34+08:00">2018-06-07</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一. 概述"></a>一. 概述</h1><p>应用层核心类主要是指libbinder库里的 IInterface、BpInterface、BpInterface、BBinder、BPBinder和IBinder类。</p>
+<blockquote>
+<p>源码位置：<br>frameworks\native\libs\binder<br>frameworks\native\include\binder</p>
+</blockquote>
+<h1 id="二-核心类解析"><a href="#二-核心类解析" class="headerlink" title="二.核心类解析"></a>二.核心类解析</h1><h1 id="2-1-IBinder-h文件"><a href="#2-1-IBinder-h文件" class="headerlink" title="2.1 IBinder.h文件"></a>2.1 IBinder.h文件</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IBinder</span> :</span> <span class="keyword">public</span> <span class="keyword">virtual</span> RefBase</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">enum</span> &#123;</span><br><span class="line">        FIRST_CALL_TRANSACTION  = <span class="number">0x00000001</span>,</span><br><span class="line">        LAST_CALL_TRANSACTION   = <span class="number">0x00ffffff</span>,</span><br><span class="line">        PING_TRANSACTION        = B_PACK_CHARS(<span class="string">'_'</span>,<span class="string">'P'</span>,<span class="string">'N'</span>,<span class="string">'G'</span>),</span><br><span class="line">        DUMP_TRANSACTION        = B_PACK_CHARS(<span class="string">'_'</span>,<span class="string">'D'</span>,<span class="string">'M'</span>,<span class="string">'P'</span>),</span><br><span class="line">        INTERFACE_TRANSACTION   = B_PACK_CHARS(<span class="string">'_'</span>, <span class="string">'N'</span>, <span class="string">'T'</span>, <span class="string">'F'</span>),</span><br><span class="line">        SYSPROPS_TRANSACTION    = B_PACK_CHARS(<span class="string">'_'</span>, <span class="string">'S'</span>, <span class="string">'P'</span>, <span class="string">'R'</span>),</span><br><span class="line">        FLAG_ONEWAY             = <span class="number">0x00000001</span></span><br><span class="line">    &#125;;</span><br><span class="line">    IBinder();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">virtual</span> sp&lt;IInterface&gt;  queryLocalInterface(<span class="keyword">const</span> String16&amp; descriptor);</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> String16&amp; <span class="title">getInterfaceDescriptor</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span>            <span class="title">isBinderAlive</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t        <span class="title">pingBinder</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t        <span class="title">dump</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> Vector&lt;String16&gt;&amp; args)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t        <span class="title">transact</span><span class="params">(   <span class="keyword">uint32_t</span> code,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">const</span> Parcel&amp; data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        Parcel* reply,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">DeathRecipient</span> :</span> <span class="keyword">public</span> <span class="keyword">virtual</span> RefBase</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">binderDied</span><span class="params">(<span class="keyword">const</span> wp&lt;IBinder&gt;&amp; who)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t        <span class="title">linkToDeath</span><span class="params">(<span class="keyword">const</span> sp&lt;DeathRecipient&gt;&amp; recipient,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span>* cookie = <span class="literal">NULL</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t        <span class="title">unlinkToDeath</span><span class="params">(  <span class="keyword">const</span> wp&lt;DeathRecipient&gt;&amp; recipient,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">void</span>* cookie = <span class="literal">NULL</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">uint32_t</span> flags = <span class="number">0</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            wp&lt;DeathRecipient&gt;* outRecipient = <span class="literal">NULL</span>)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span>            <span class="title">checkSubclass</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* subclassID)</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*object_cleanup_func)</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* id, <span class="keyword">void</span>* obj, <span class="keyword">void</span>* cleanupCookie)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>            <span class="title">attachObject</span><span class="params">(   <span class="keyword">const</span> <span class="keyword">void</span>* objectID,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">void</span>* object,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">void</span>* cleanupCookie,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            object_cleanup_func func)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>*           <span class="title">findObject</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>            <span class="title">detachObject</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> BBinder*        <span class="title">localBinder</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> BpBinder*       <span class="title">remoteBinder</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">virtual</span>          ~IBinder();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="2-2-Binder-h文件"><a href="#2-2-Binder-h文件" class="headerlink" title="2.2 Binder.h文件"></a>2.2 Binder.h文件</h1><h1 id="2-2-1-BBinder类"><a href="#2-2-1-BBinder类" class="headerlink" title="2.2.1 BBinder类"></a>2.2.1 BBinder类</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BBinder</span> :</span> <span class="keyword">public</span> IBinder</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">                        BBinder();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> String16&amp; <span class="title">getInterfaceDescriptor</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span>        <span class="title">isBinderAlive</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">pingBinder</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">dump</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> Vector&lt;String16&gt;&amp; args)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">transact</span><span class="params">(   <span class="keyword">uint32_t</span> code,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">const</span> Parcel&amp; data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    Parcel* reply,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">linkToDeath</span><span class="params">(<span class="keyword">const</span> sp&lt;DeathRecipient&gt;&amp; recipient,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">void</span>* cookie = <span class="literal">NULL</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">unlinkToDeath</span><span class="params">(  <span class="keyword">const</span> wp&lt;DeathRecipient&gt;&amp; recipient,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span>* cookie = <span class="literal">NULL</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">uint32_t</span> flags = <span class="number">0</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        wp&lt;DeathRecipient&gt;* outRecipient = <span class="literal">NULL</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>        <span class="title">attachObject</span><span class="params">(   <span class="keyword">const</span> <span class="keyword">void</span>* objectID,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span>* object,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span>* cleanupCookie,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        object_cleanup_func func)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>*       <span class="title">findObject</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>        <span class="title">detachObject</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> BBinder*    <span class="title">localBinder</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">virtual</span>             ~BBinder();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">onTransact</span><span class="params">( <span class="keyword">uint32_t</span> code,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">const</span> Parcel&amp; data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    Parcel* reply,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">                        BBinder(<span class="keyword">const</span> BBinder&amp; o);</span><br><span class="line">            BBinder&amp;    <span class="keyword">operator</span>=(<span class="keyword">const</span> BBinder&amp; o);</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Extras</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">atomic_uintptr_t</span>    mExtras;  <span class="comment">// should be atomic&lt;Extras *&gt;</span></span><br><span class="line">            <span class="keyword">void</span>*       mReserved0;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="2-2-2-BpRefBase类"><a href="#2-2-2-BpRefBase类" class="headerlink" title="2.2.2 BpRefBase类"></a>2.2.2 BpRefBase类</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BpRefBase</span> :</span> <span class="keyword">public</span> <span class="keyword">virtual</span> RefBase</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">                            BpRefBase(<span class="keyword">const</span> sp&lt;IBinder&gt;&amp; o);</span><br><span class="line">    <span class="keyword">virtual</span>                 ~BpRefBase();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>            <span class="title">onFirstRef</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>            <span class="title">onLastStrongRef</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* id)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span>            <span class="title">onIncStrongAttempted</span><span class="params">(<span class="keyword">uint32_t</span> flags, <span class="keyword">const</span> <span class="keyword">void</span>* id)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">inline</span>  IBinder*        <span class="title">remote</span><span class="params">()</span>                </span>&#123; <span class="keyword">return</span> mRemote; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span>  IBinder*        <span class="title">remote</span><span class="params">()</span> <span class="keyword">const</span>          </span>&#123; <span class="keyword">return</span> mRemote; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">                            BpRefBase(<span class="keyword">const</span> BpRefBase&amp; o);</span><br><span class="line">    BpRefBase&amp;              <span class="keyword">operator</span>=(<span class="keyword">const</span> BpRefBase&amp; o);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//这边的IBinder对象其实是 BpBinder 类型的 (#2.3节)</span></span><br><span class="line">    IBinder* <span class="keyword">const</span>          mRemote;</span><br><span class="line">    </span><br><span class="line">	RefBase::weakref_type*  mRefs;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">int32_t</span>        mState;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="2-3-BpBinder-h-文件"><a href="#2-3-BpBinder-h-文件" class="headerlink" title="2.3 BpBinder.h 文件"></a>2.3 BpBinder.h 文件</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BpBinder</span> :</span> <span class="keyword">public</span> IBinder</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">                        BpBinder(<span class="keyword">int32_t</span> handle);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">inline</span>  int32_t     <span class="title">handle</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> mHandle; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> String16&amp;    <span class="title">getInterfaceDescriptor</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span>        <span class="title">isBinderAlive</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">pingBinder</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">dump</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> Vector&lt;String16&gt;&amp; args)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">transact</span><span class="params">(   <span class="keyword">uint32_t</span> code,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">const</span> Parcel&amp; data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    Parcel* reply,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">linkToDeath</span><span class="params">(<span class="keyword">const</span> sp&lt;DeathRecipient&gt;&amp; recipient,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">void</span>* cookie = <span class="literal">NULL</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">unlinkToDeath</span><span class="params">(  <span class="keyword">const</span> wp&lt;DeathRecipient&gt;&amp; recipient,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span>* cookie = <span class="literal">NULL</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">uint32_t</span> flags = <span class="number">0</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        wp&lt;DeathRecipient&gt;* outRecipient = <span class="literal">NULL</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>        <span class="title">attachObject</span><span class="params">(   <span class="keyword">const</span> <span class="keyword">void</span>* objectID,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span>* object,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span>* cleanupCookie,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        object_cleanup_func func)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>*       <span class="title">findObject</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>        <span class="title">detachObject</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> BpBinder*   <span class="title">remoteBinder</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">status_t</span>    setConstantData(<span class="keyword">const</span> <span class="keyword">void</span>* data, <span class="keyword">size_t</span> size);</span><br><span class="line">            <span class="function"><span class="keyword">void</span>        <span class="title">sendObituary</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">ObjectManager</span></span></span><br><span class="line"><span class="class">    &#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">                    ObjectManager();</span><br><span class="line">                    ~ObjectManager();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span>        <span class="title">attach</span><span class="params">( <span class="keyword">const</span> <span class="keyword">void</span>* objectID,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">void</span>* object,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">void</span>* cleanupCookie,</span></span></span><br><span class="line"><span class="function"><span class="params">                            IBinder::object_cleanup_func func)</span></span>;</span><br><span class="line">        <span class="function"><span class="keyword">void</span>*       <span class="title">find</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span> <span class="keyword">const</span></span>;</span><br><span class="line">        <span class="function"><span class="keyword">void</span>        <span class="title">detach</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* objectID)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span>        <span class="title">kill</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">                    ObjectManager(<span class="keyword">const</span> ObjectManager&amp;);</span><br><span class="line">        ObjectManager&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> ObjectManager&amp;);</span><br><span class="line"></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">entry_t</span></span></span><br><span class="line"><span class="class">        &#123;</span></span><br><span class="line">            <span class="keyword">void</span>* object;</span><br><span class="line">            <span class="keyword">void</span>* cleanupCookie;</span><br><span class="line">            IBinder::object_cleanup_func func;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        KeyedVector&lt;<span class="keyword">const</span> <span class="keyword">void</span>*, <span class="keyword">entry_t</span>&gt; mObjects;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">virtual</span>             ~BpBinder();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>        <span class="title">onFirstRef</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>        <span class="title">onLastStrongRef</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* id)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span>        <span class="title">onIncStrongAttempted</span><span class="params">(<span class="keyword">uint32_t</span> flags, <span class="keyword">const</span> <span class="keyword">void</span>* id)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">const</span>   <span class="keyword">int32_t</span>             mHandle;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Obituary</span> &#123;</span></span><br><span class="line">        wp&lt;DeathRecipient&gt; recipient;</span><br><span class="line">        <span class="keyword">void</span>* cookie;</span><br><span class="line">        <span class="keyword">uint32_t</span> flags;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="keyword">void</span>                <span class="title">reportOneDeath</span><span class="params">(<span class="keyword">const</span> Obituary&amp; obit)</span></span>;</span><br><span class="line">            <span class="function"><span class="keyword">bool</span>                <span class="title">isDescriptorCached</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">mutable</span> Mutex               mLock;</span><br><span class="line">            <span class="keyword">volatile</span> <span class="keyword">int32_t</span>    mAlive;</span><br><span class="line">            <span class="keyword">volatile</span> <span class="keyword">int32_t</span>    mObitsSent;</span><br><span class="line">            Vector&lt;Obituary&gt;*   mObituaries;</span><br><span class="line">            ObjectManager       mObjects;</span><br><span class="line">            Parcel*             mConstantData;</span><br><span class="line">    <span class="keyword">mutable</span> String16            mDescriptorCache;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="2-4-IInterface-h文件"><a href="#2-4-IInterface-h文件" class="headerlink" title="2.4 IInterface.h文件"></a>2.4 IInterface.h文件</h1><h1 id="2-4-1-两个宏"><a href="#2-4-1-两个宏" class="headerlink" title="2.4.1 两个宏"></a>2.4.1 两个宏</h1><p>DECLARE_META_INTERFACE 宏定义的内容</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ----------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DECLARE_META_INTERFACE(INTERFACE)                               \</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> android::String16 descriptor;                          \</span><br><span class="line">    <span class="keyword">static</span> android::sp&lt;I##INTERFACE&gt; asInterface(                       \</span><br><span class="line">            <span class="keyword">const</span> android::sp&lt;android::IBinder&gt;&amp; obj);                  \</span><br><span class="line">    <span class="keyword">virtual</span> <span class="keyword">const</span> android::<span class="function">String16&amp; <span class="title">getInterfaceDescriptor</span><span class="params">()</span> <span class="keyword">const</span></span>;    \</span><br><span class="line">    I##INTERFACE();                                                     \</span><br><span class="line">    <span class="keyword">virtual</span> ~I##INTERFACE();                                            \</span><br></pre></td></tr></table></figure>
+<p>这个宏定义了如下东西：</p>
+<ul>
+<li>静态成员变量 descriptor</li>
+<li>静态函数 asInterface()</li>
+<li>类的构造函数</li>
+<li>类的析构函数</li>
+</ul>
+<p>IMPLEMENT_META_INTERFACE 宏定义的内容</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IMPLEMENT_META_INTERFACE(INTERFACE, NAME)                       \</span></span><br><span class="line">    <span class="keyword">const</span> android::String16 I##INTERFACE::descriptor(NAME);             \</span><br><span class="line">    <span class="keyword">const</span> android::String16&amp;                                            \</span><br><span class="line">            I##INTERFACE::getInterfaceDescriptor() <span class="keyword">const</span> &#123;              \</span><br><span class="line">        <span class="keyword">return</span> I##INTERFACE::descriptor;                                \</span><br><span class="line">    &#125;                                                                   \</span><br><span class="line">    android::sp&lt;I##INTERFACE&gt; I##INTERFACE::asInterface(                \</span><br><span class="line">            <span class="keyword">const</span> android::sp&lt;android::IBinder&gt;&amp; obj)                   \</span><br><span class="line">    &#123;                                                                   \</span><br><span class="line">        android::sp&lt;I##INTERFACE&gt; intr;                                 \</span><br><span class="line">        <span class="keyword">if</span> (obj != <span class="literal">NULL</span>) &#123;                                              \</span><br><span class="line">            intr = <span class="keyword">static_cast</span>&lt;I##INTERFACE*&gt;(                          \</span><br><span class="line">                obj-&gt;queryLocalInterface(                               \</span><br><span class="line">                        I##INTERFACE::descriptor).get());               \</span><br><span class="line">            <span class="keyword">if</span> (intr == <span class="literal">NULL</span>) &#123;                                         \</span><br><span class="line">                intr = <span class="keyword">new</span> Bp##INTERFACE(obj);                          \</span><br><span class="line">            &#125;                                                           \</span><br><span class="line">        &#125;                                                               \</span><br><span class="line">        <span class="keyword">return</span> intr;                                                    \</span><br><span class="line">    &#125;                                                                   \</span><br><span class="line">    I##INTERFACE::I##INTERFACE() &#123; &#125;                                    \</span><br><span class="line">    I##INTERFACE::~I##INTERFACE() &#123; &#125;                                   \</span><br></pre></td></tr></table></figure>
+<p>这个宏定义了如下内容</p>
+<ul>
+<li>静态成员变量 descriptor 赋值为name</li>
+<li>定义了获取静态成员变量 descriptor 的方法 getInterfaceDescriptor()</li>
+<li>实现了静态函数 asInterface()，函数作用：将binder的引用对象转化为代理对象（<a href="/2018/06/05/Binder开篇/" title="Binder 开篇">Binder 开篇</a> 第二节 ）</li>
+<li>实现类的构造函数</li>
+<li>实现类的析构函数</li>
+</ul>
+<h1 id="2-4-2-三个类"><a href="#2-4-2-三个类" class="headerlink" title="2.4.2 三个类"></a>2.4.2 三个类</h1><h1 id="2-4-2-1-IInterface-类"><a href="#2-4-2-1-IInterface-类" class="headerlink" title="2.4.2.1 IInterface 类"></a>2.4.2.1 IInterface 类</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IInterface</span> :</span> <span class="keyword">public</span> <span class="keyword">virtual</span> RefBase</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">            IInterface();</span><br><span class="line">            <span class="keyword">static</span> sp&lt;IBinder&gt;  asBinder(<span class="keyword">const</span> IInterface*);</span><br><span class="line">            <span class="keyword">static</span> sp&lt;IBinder&gt;  asBinder(<span class="keyword">const</span> sp&lt;IInterface&gt;&amp;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">virtual</span>                     ~IInterface();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> IBinder*            <span class="title">onAsBinder</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="2-4-2-3-BnInterface-类"><a href="#2-4-2-3-BnInterface-类" class="headerlink" title="2.4.2.3 BnInterface 类"></a>2.4.2.3 BnInterface 类</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> INTERFACE&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BnInterface</span> :</span> <span class="keyword">public</span> INTERFACE, <span class="keyword">public</span> BBinder</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> sp&lt;IInterface&gt;      queryLocalInterface(<span class="keyword">const</span> String16&amp; _descriptor);</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> String16&amp;     <span class="title">getInterfaceDescriptor</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> IBinder*            <span class="title">onAsBinder</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="2-4-2-3-BpInterface类"><a href="#2-4-2-3-BpInterface类" class="headerlink" title="2.4.2.3 BpInterface类"></a>2.4.2.3 BpInterface类</h1><p>这边继承了BpRefBase类，在上面 2.2.2节中 我们可以看到其实 BpRefBase 聚合了 BpBinder 类</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> INTERFACE&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BpInterface</span> :</span> <span class="keyword">public</span> INTERFACE, <span class="keyword">public</span> BpRefBase</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	BpInterface(<span class="keyword">const</span> sp&lt;IBinder&gt;&amp; remote);</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> IBinder* <span class="title">onAsBinder</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>INTERFACE 指定的是继承自 IInterface 接口的派生类。</p>
+<p>2.5 总结</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/07/日常问题-动态广播无法唤起singtask模式下的activity/" rel="next" title="日常问题:动态广播无法唤起singtask模式下的activity">
+                <i class="fa fa-chevron-left"></i> 日常问题:动态广播无法唤起singtask模式下的activity
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/08/日常问题-自定义系统权限级签名/" rel="prev" title="日常问题:自定义系统权限级签名">
+                日常问题:自定义系统权限级签名 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="道墟" />
+            
+              <p class="site-author-name" itemprop="name">道墟</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">Artikel</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">Kategorien</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">Tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一-概述"><span class="nav-text">一. 概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二-核心类解析"><span class="nav-text">二.核心类解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-IBinder-h文件"><span class="nav-text">2.1 IBinder.h文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-Binder-h文件"><span class="nav-text">2.2 Binder.h文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-1-BBinder类"><span class="nav-text">2.2.1 BBinder类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-2-BpRefBase类"><span class="nav-text">2.2.2 BpRefBase类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-3-BpBinder-h-文件"><span class="nav-text">2.3 BpBinder.h 文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-IInterface-h文件"><span class="nav-text">2.4 IInterface.h文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-1-两个宏"><span class="nav-text">2.4.1 两个宏</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-2-三个类"><span class="nav-text">2.4.2 三个类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-2-1-IInterface-类"><span class="nav-text">2.4.2.1 IInterface 类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-2-3-BnInterface-类"><span class="nav-text">2.4.2.3 BnInterface 类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-2-3-BpInterface类"><span class="nav-text">2.4.2.3 BpInterface类</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">道墟</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

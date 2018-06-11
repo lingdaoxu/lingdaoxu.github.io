@@ -108,25 +108,24 @@
 
 
 
-  <meta name="description" content="一.引言Android系统非常庞大、错综复杂，其底层是采用Linux作为基底，上层采用包含虚拟机的Java层以及Native层，通过系统调用(Syscall)连通系统的内核空间与用户空间。用户空间主要采用C++和Java代码，通过JNI技术打通用户空间的Java层和Native层(C++/C)，从而融为一体。 限于本人目前的只是水平,本系列的源码分析基本限于framework层的java代码。目前">
-<meta name="keywords" content="android,framework">
+  <meta name="description" content="一.概述Binder是Android系统提供的一种IPC（进程间通信）机制。由于Android是基于Linux内核的，因此，除了Binder外，还存在其他的IPC机制，例如管道和socket等。Binder相对于其他IPC机制来说，就更加灵活和方便了。对于初学Android的朋友而言，最难却又最想掌握的恐怕就是Binder机制了，因为Android系统基本上可以看作是一个基于Binder通信的C/">
 <meta property="og:type" content="article">
-<meta property="og:title" content="源码导航">
-<meta property="og:url" content="http://yoursite.com/2018/05/29/android6.0/总览/index.html">
+<meta property="og:title" content="Binder 开篇">
+<meta property="og:url" content="http://yoursite.com/2018/06/05/Binder开篇/index.html">
 <meta property="og:site_name" content="道墟">
-<meta property="og:description" content="一.引言Android系统非常庞大、错综复杂，其底层是采用Linux作为基底，上层采用包含虚拟机的Java层以及Native层，通过系统调用(Syscall)连通系统的内核空间与用户空间。用户空间主要采用C++和Java代码，通过JNI技术打通用户空间的Java层和Native层(C++/C)，从而融为一体。 限于本人目前的只是水平,本系列的源码分析基本限于framework层的java代码。目前">
+<meta property="og:description" content="一.概述Binder是Android系统提供的一种IPC（进程间通信）机制。由于Android是基于Linux内核的，因此，除了Binder外，还存在其他的IPC机制，例如管道和socket等。Binder相对于其他IPC机制来说，就更加灵活和方便了。对于初学Android的朋友而言，最难却又最想掌握的恐怕就是Binder机制了，因为Android系统基本上可以看作是一个基于Binder通信的C/">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-06T01:04:38.230Z">
+<meta property="og:updated_time" content="2018-06-07T03:02:33.815Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="源码导航">
-<meta name="twitter:description" content="一.引言Android系统非常庞大、错综复杂，其底层是采用Linux作为基底，上层采用包含虚拟机的Java层以及Native层，通过系统调用(Syscall)连通系统的内核空间与用户空间。用户空间主要采用C++和Java代码，通过JNI技术打通用户空间的Java层和Native层(C++/C)，从而融为一体。 限于本人目前的只是水平,本系列的源码分析基本限于framework层的java代码。目前">
+<meta name="twitter:title" content="Binder 开篇">
+<meta name="twitter:description" content="一.概述Binder是Android系统提供的一种IPC（进程间通信）机制。由于Android是基于Linux内核的，因此，除了Binder外，还存在其他的IPC机制，例如管道和socket等。Binder相对于其他IPC机制来说，就更加灵活和方便了。对于初学Android的朋友而言，最难却又最想掌握的恐怕就是Binder机制了，因为Android系统基本上可以看作是一个基于Binder通信的C/">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/05/29/android6.0/总览/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/05/Binder开篇/"/>
 
 
 
@@ -136,7 +135,7 @@
   };
 </script>
 
-  <title>源码导航 | 道墟</title>
+  <title>Binder 开篇 | 道墟</title>
   
 
 
@@ -285,7 +284,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/29/android6.0/总览/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/Binder开篇/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="道墟">
@@ -302,7 +301,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">源码导航
+          <h1 class="post-title" itemprop="name headline">Binder 开篇
               
             
           </h1>
@@ -327,7 +326,7 @@
                 
               
 
-              <time title="Post created: 2018-05-29 13:37:00" itemprop="dateCreated datePublished" datetime="2018-05-29T13:37:00+08:00">2018-05-29</time>
+              <time title="Post created: 2018-06-05 23:59:00" itemprop="dateCreated datePublished" datetime="2018-06-05T23:59:00+08:00">2018-06-05</time>
             
 
             
@@ -344,7 +343,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Updated at: 2018-06-06 09:04:38" itemprop="dateModified" datetime="2018-06-06T09:04:38+08:00">2018-06-06</time>
+                <time title="Updated at: 2018-06-07 11:02:33" itemprop="dateModified" datetime="2018-06-07T11:02:33+08:00">2018-06-07</time>
               
             
           </span>
@@ -362,13 +361,6 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/android6-0/" itemprop="url" rel="index"><span itemprop="name">android6.0</span></a></span>
-
-                
-                
-                  . 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/android6-0/导读/" itemprop="url" rel="index"><span itemprop="name">导读</span></a></span>
 
                 
                 
@@ -402,79 +394,37 @@
       
 
       
-        <h1 id="一-引言"><a href="#一-引言" class="headerlink" title="一.引言"></a>一.引言</h1><p>Android系统非常庞大、错综复杂，其底层是采用Linux作为基底，上层采用包含虚拟机的Java层以及Native层，通过系统调用(Syscall)连通系统的内核空间与用户空间。用户空间主要采用C++和Java代码，通过JNI技术打通用户空间的Java层和Native层(C++/C)，从而融为一体。</p>
-<p>限于本人目前的只是水平,本系列的源码分析基本限于framework层的java代码。目前，网上有大量的android系统源码分析的书籍和博客，其实很不多优秀的文章。那为什么要再写一个自己的blog呢？这是因为android源码分析是个工程量非常巨大的事，在学些的过程中很容易迷失在源码的森林中，经常会出现看完一个模块，过一段时间就忘记的情况，所以很有必要将自己看的过程记录下来，同时也加深自己的理解。</p>
-<p>首先说明本系列的源码分析是基于android6.0的源码，主要以事件为驱动来分析源码，比如我们我们在分析PKMS（PackageManagerService）服务的时候我们会从开机扫描过程，应用的安装过程等事件的流程进行分析解读。</p>
-<h1 id="二-Binder机制"><a href="#二-Binder机制" class="headerlink" title="二.Binder机制"></a>二.Binder机制</h1><table>
-<thead>
-<tr>
-<th>Binder 开篇</th>
-<th><a href="/2018/06/05/Binder开篇/" title="Binder 开篇">Binder 开篇</a></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h1 id="三-Android系统启动系列"><a href="#三-Android系统启动系列" class="headerlink" title="三.Android系统启动系列"></a>三.Android系统启动系列</h1><table>
-<thead>
-<tr>
-<th>Init进程</th>
-<th><a href="/2018/05/31/Init进程/" title="Init进程">Init进程</a></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Zygote进程</td>
-<td><a href="/2018/06/01/Zygote进程/" title="Zygote进程">Zygote进程</a></td>
-</tr>
-<tr>
-<td>SystemServer进程</td>
-<td><a href="/2018/06/04/SystemServer服务/" title="SystemServer服务">SystemServer服务</a></td>
-</tr>
-</tbody>
-</table>
-<h1 id="四-PackageManagerService"><a href="#四-PackageManagerService" class="headerlink" title="四.PackageManagerService"></a>四.PackageManagerService</h1><table>
-<thead>
-<tr>
-<th>开机应用扫描流程</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>应用安装流程</td>
-</tr>
-</tbody>
-</table>
-<h1 id="五-ActivityManagerService"><a href="#五-ActivityManagerService" class="headerlink" title="五.ActivityManagerService"></a>五.ActivityManagerService</h1><table>
-<thead>
-<tr>
-<th>开机广播流程</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Activity启动流程</td>
-<td></td>
-</tr>
-<tr>
-<td>Service启动流程</td>
-<td></td>
-</tr>
-<tr>
-<td>registerReceiver流程</td>
-<td></td>
-</tr>
-<tr>
-<td>sendBroadcast流程</td>
-</tr>
-</tbody>
-</table>
-<h1 id="六-WindowManagerService"><a href="#六-WindowManagerService" class="headerlink" title="六.WindowManagerService"></a>六.WindowManagerService</h1><h1 id="七-致谢"><a href="#七-致谢" class="headerlink" title="七.致谢"></a>七.致谢</h1><p>在blog的编写过程中会大量的引用平时看的书籍和前辈优秀的blog,在这边会贴出引用的书籍和blog地址！</p>
+        <h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一.概述"></a>一.概述</h1><p>Binder是Android系统提供的一种IPC（进程间通信）机制。由于Android是基于Linux内核的，因此，除了Binder外，还存在其他的IPC机制，例如管道和socket等。Binder相对于其他IPC机制来说，就更加灵活和方便了。对于初学Android的朋友而言，最难却又最想掌握的恐怕就是Binder机制了，因为Android系统基本上可以看作是一个基于Binder通信的C/S架构。Binder就像网络一样，把系统各个部分连接在了一起，因此它是非常重要的。</p>
+<h1 id="二-Binder对象定义"><a href="#二-Binder对象定义" class="headerlink" title="二.Binder对象定义"></a>二.Binder对象定义</h1><p>Binder用到的对象很多，而且名字还挺像的，如果不先预先约定理清楚的话，在后续的文章中会容易看晕，这边我们先对文章内提到的各个对象先约定好称呼（非官方定义，仅在本系列文章中使用）。</p>
+<ul>
+<li>Binder实体对象：Binder实体对象就是Binder<strong>服务的提供者</strong>。它必须继承自BBinder类，所以也叫 BBinder 对象。</li>
+<li>Binder引用对象：Binder引用对象是Binder实体对象在<strong>客户端的代表</strong>，它的类型是BpBinder类，所以也叫 BpBinder 对象。</li>
+<li>Binder代理对象：代理对象也叫<strong>接口对象</strong>，它主要是为客户端上层应用提供接口服务，从IInterface类派生。它实现了Binder服务的函数接口，当然这只是一个空壳，里面其实是直接转调<strong>Binder引用对象</strong>的方法。一般应用程序是使用Binder代理对象的。代理对象和引用的对象的关系是多对1的。</li>
+<li>IBinder对象：BBinder 和 BpBinder 都是从 IBinder 类中继承的。所以可以用IBinder对象来统称它们两个。</li>
+</ul>
+<h1 id="三-Binder架构"><a href="#三-Binder架构" class="headerlink" title="三.Binder架构"></a>三.Binder架构</h1><p>Binder通信架构主要由四部分组成</p>
+<h1 id="3-1-Binder驱动"><a href="#3-1-Binder驱动" class="headerlink" title="3.1 Binder驱动"></a>3.1 Binder驱动</h1><p>Binder驱动位于内核空间，是Binder架构的核心，通过文件系统的标准接口（open ioctl mmap等）向用户空间提供服务。应用层和Binder驱动的数据交换是通过ioctl进行（ioctl可以达到一次系统调用就完成用户系统和Binder驱动的双向数据交互）。</p>
+<p>作用：提供Binder通信的通道、维护Binder对象的引用计数、转换传输中的Binder实体对象和引用对象、管理数据缓存区。</p>
+<h1 id="3-2-ServiceManager"><a href="#3-2-ServiceManager" class="headerlink" title="3.2 ServiceManager"></a>3.2 ServiceManager</h1><p>ServiceManager是一个守护进程，它是在init进程中通过init.rc文件启动的（<a href="/2018/05/31/Init进程/" title="Init进程">Init进程</a> 2.1.10节）。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">service servicemanager /system/bin/servicemanager</span><br><span class="line">    class core</span><br><span class="line">    user system</span><br><span class="line">    group system</span><br><span class="line">    critical</span><br><span class="line">    onrestart restart healthd</span><br><span class="line">    onrestart restart zygote</span><br><span class="line">    onrestart restart media</span><br><span class="line">    onrestart restart surfaceflinger</span><br><span class="line">    onrestart restart drm</span><br></pre></td></tr></table></figure></p>
+<p>作用：提供Binder服务的查询，返回被查询服务的引用。</p>
+<p>ServiceManager进程也是通过Binder框架来提供服务的。这样就会才生鸡生蛋，蛋孵鸡的悖论了，作为Binder服务的提供者，它也需要使用某种方式让使用者获取到它的引用对象，然后再其他情况下，这个操作是由ServiceManagaer来提供查询服务的，这就互相冲突了。这边Binder架构使用一个非常暴力简单的方式解决这个问题。因为Binder引用对象的核心数据是一个实体对象的引用号，它是在驱动内部分配的一个值。所以Binder框架强制规定0代表了ServiceManager。</p>
+<p>为什么需要ServiceManager?</p>
+<blockquote>
+<p>理论上我们可以把查询的步骤放在Binder架构的核心–Binder驱动中来直接处理，那为什么还需要通过ServiceManager进程来作为中转呢?<br>这就要提到android的安全机制了，在android系统中是不允许任意进程都能注册Binder服务的，虽然任意的进程都可以创建Binder服务，但是只有root和system用户可以不受限制的在ServiceManager中注册服务。当然普通用户ID的进程也是可以注册Binder服务的，但是在ServiceManager有张表会记录着可以注册Binder服务的进程的用户ID，以及进程能够注册的服务名称，ServiceManager是就是过这张表来控制普通进程的注册请求（5.0以后不再通过表来控制，而是使用SELinux来检查权限）。</p>
+</blockquote>
+<h1 id="3-3-服务端"><a href="#3-3-服务端" class="headerlink" title="3.3 服务端"></a>3.3 服务端</h1><p>Binder服务分为：实名服务和匿名服务。它们从开发到使用并没有什么区别，唯一的区别就是实名服务可以通过ServiceManager查询到。Android的实名服务都是系统提供，比如我们后续要学习的：AMS,PKMS，WMS等。而我们平时我们在普通应用里面创建Binder服务都是匿名服务。</p>
+<p>如果按上面说的匿名服务无法通过ServiceManager查询到，那么使用者是通过什么方式获取到它的引用对象呢？其实还是通过Binder。</p>
+<p>匿名服务经常使用的场景：服务进程回调客户进程中的函数。下面是整个使用过程：</p>
+<blockquote>
+<p>客户端和服务端通过binder连接上后，客户端将本进程创建的<strong>匿名服务的实体对象</strong>作为参数传递到服务端，binder驱动会在中间<strong>将实体对象转换成引用对象</strong>，这样服务进程就得到了客户进程创建的Binder服务的引用对象，然后就可以回调进程中的binder服务的函数了。</p>
+</blockquote>
+<h1 id="3-3-1-组件Service和匿名Binder服务"><a href="#3-3-1-组件Service和匿名Binder服务" class="headerlink" title="3.3.1 组件Service和匿名Binder服务"></a>3.3.1 组件Service和匿名Binder服务</h1><h1 id="3-4-客户端"><a href="#3-4-客户端" class="headerlink" title="3.4 客户端"></a>3.4 客户端</h1><h1 id="四-Binder的层次"><a href="#四-Binder的层次" class="headerlink" title="四.Binder的层次"></a>四.Binder的层次</h1><ul>
+<li>服务类和接口类：位于framework层，为应用程序提供各种各样的服务，例如AMS,PKMS,WMS等</li>
+<li>Binder核心类：Ibinder、BBinder、BpBinder,这是上层 服务类和接口类的基础</li>
+<li>IPCThreadState：和驱动交换</li>
+<li>驱动层</li>
+</ul>
+<p>二三层可以可以合称为libbinder层</p>
 
       
     </div>
@@ -493,14 +443,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/android/" rel="tag"># android</a>
-          
-            <a href="/tags/framework/" rel="tag"># framework</a>
-          
-        </div>
-      
 
       
       
@@ -510,14 +452,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/06/04/SystemServer服务/" rel="next" title="SystemServer服务">
+                <i class="fa fa-chevron-left"></i> SystemServer服务
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/05/29/工作问题/rk/动态更改Launch应用/" rel="prev" title="动态更改Launch应用">
-                动态更改Launch应用 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/07/日常问题-动态广播无法唤起singtask模式下的activity/" rel="prev" title="日常问题:动态广播无法唤起singtask模式下的activity">
+                日常问题:动态广播无法唤起singtask模式下的activity <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -672,7 +618,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一-引言"><span class="nav-text">一.引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二-Binder机制"><span class="nav-text">二.Binder机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三-Android系统启动系列"><span class="nav-text">三.Android系统启动系列</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四-PackageManagerService"><span class="nav-text">四.PackageManagerService</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#五-ActivityManagerService"><span class="nav-text">五.ActivityManagerService</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#六-WindowManagerService"><span class="nav-text">六.WindowManagerService</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#七-致谢"><span class="nav-text">七.致谢</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一-概述"><span class="nav-text">一.概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二-Binder对象定义"><span class="nav-text">二.Binder对象定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三-Binder架构"><span class="nav-text">三.Binder架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-1-Binder驱动"><span class="nav-text">3.1 Binder驱动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-2-ServiceManager"><span class="nav-text">3.2 ServiceManager</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-3-服务端"><span class="nav-text">3.3 服务端</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-3-1-组件Service和匿名Binder服务"><span class="nav-text">3.3.1 组件Service和匿名Binder服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-4-客户端"><span class="nav-text">3.4 客户端</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四-Binder的层次"><span class="nav-text">四.Binder的层次</span></a></li></ol></div>
             
 
           </div>

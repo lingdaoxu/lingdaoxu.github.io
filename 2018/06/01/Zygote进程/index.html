@@ -111,11 +111,11 @@
   <meta name="description" content="一.概述1.1 什么是ZygoteLinux的进程是通过系统调用fork产生的，fork出的子进程除了内核中的一些核心数据结构和父进程不同外，其余的内存映像都是和父进程共享的。当子进程需要去改写这些共享数据的内存时，操作系统才会为子进程分配一个新的内存页，并将老的页面数据复制到新的页面上后再进行修改操作（写时拷贝）。 fork出来的进程会继续执行系统调用exec。exec将用一个新的可执行文件的内">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Zygote进程">
-<meta property="og:url" content="http://yoursite.com/2018/06/01/Zygote/index.html">
+<meta property="og:url" content="http://yoursite.com/2018/06/01/Zygote进程/index.html">
 <meta property="og:site_name" content="道墟">
 <meta property="og:description" content="一.概述1.1 什么是ZygoteLinux的进程是通过系统调用fork产生的，fork出的子进程除了内核中的一些核心数据结构和父进程不同外，其余的内存映像都是和父进程共享的。当子进程需要去改写这些共享数据的内存时，操作系统才会为子进程分配一个新的内存页，并将老的页面数据复制到新的页面上后再进行修改操作（写时拷贝）。 fork出来的进程会继续执行系统调用exec。exec将用一个新的可执行文件的内">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-05T01:10:34.819Z">
+<meta property="og:updated_time" content="2018-06-06T01:04:38.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Zygote进程">
 <meta name="twitter:description" content="一.概述1.1 什么是ZygoteLinux的进程是通过系统调用fork产生的，fork出的子进程除了内核中的一些核心数据结构和父进程不同外，其余的内存映像都是和父进程共享的。当子进程需要去改写这些共享数据的内存时，操作系统才会为子进程分配一个新的内存页，并将老的页面数据复制到新的页面上后再进行修改操作（写时拷贝）。 fork出来的进程会继续执行系统调用exec。exec将用一个新的可执行文件的内">
@@ -125,7 +125,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/06/01/Zygote/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/01/Zygote进程/"/>
 
 
 
@@ -225,7 +225,7 @@
           
           <li class="menu-item menu-item-home">
     <a href="/" rel="section">
-      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
   </li>
         
         
@@ -233,7 +233,7 @@
           
           <li class="menu-item menu-item-archives">
     <a href="/archives/" rel="section">
-      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
   </li>
 
       
@@ -284,7 +284,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/01/Zygote/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/01/Zygote进程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="道墟">
@@ -319,14 +319,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">Veröffentlicht am</span>
               
 
               
                 
               
 
-              <time title="Created: 2018-06-01 16:21:00" itemprop="dateCreated datePublished" datetime="2018-06-01T16:21:00+08:00">2018-06-01</time>
+              <time title="Post created: 2018-06-01 16:21:00" itemprop="dateCreated datePublished" datetime="2018-06-01T16:21:00+08:00">2018-06-01</time>
             
 
             
@@ -343,11 +343,29 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-06-05 09:10:34" itemprop="dateModified" datetime="2018-06-05T09:10:34+08:00">2018-06-05</time>
+                <time title="Updated at: 2018-06-06 09:04:38" itemprop="dateModified" datetime="2018-06-06T09:04:38+08:00">2018-06-06</time>
               
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/android6-0/" itemprop="url" rel="index"><span itemprop="name">android6.0</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -378,7 +396,7 @@
       
         <h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一.概述"></a>一.概述</h1><h1 id="1-1-什么是Zygote"><a href="#1-1-什么是Zygote" class="headerlink" title="1.1 什么是Zygote"></a>1.1 什么是Zygote</h1><p>Linux的进程是通过系统调用fork产生的，fork出的子进程除了内核中的一些核心数据结构和父进程不同外，其余的内存映像都是和父进程共享的。当子进程需要去改写这些共享数据的内存时，操作系统才会为子进程分配一个新的内存页，并将老的页面数据复制到新的页面上后再进行修改操作（写时拷贝）。</p>
 <p>fork出来的进程会继续执行系统调用exec。exec将用一个新的可执行文件的内容替换当前进程的代码段、数据段、堆和栈段。</p>
-<p>fork+exec是Linux启动进程的标准做法，Init进程中启动的服务也是这样做的，Zygote进程就是这么被启动起来的。（<a href="/2018/05/31/Init进程/" title="Init进程">Init进程</a> 2.2.3处）</p>
+<p>fork+exec是Linux启动进程的标准做法，Init进程中启动的服务也是这样做的，Zygote进程就是这么被启动起来的。（ <a href="/2018/05/31/Init进程/" title="Init进程">Init进程</a>  2.2.3处）</p>
 <p>那么Zygote是怎么做的呢？Zygote在创建应用程序的只执行了fork操作，没有去调用exec。</p>
 <p>Zygote初始化时会创建虚拟机，同时把需要的系统类库和资源文件加载到内存中。Zygote fork出子进程后（系统会根据apk的类型来选择fork 32位还是64位的 Zygote），这个子进程也继承了能正常工作的虚拟机和各种系统资源。接下来子进程只需要加载APK中的字节码就可以运行了。这样就达到了减少启动时间的作用。</p>
 <h1 id="1-2-启动的时机"><a href="#1-2-启动的时机" class="headerlink" title="1.2 启动的时机"></a>1.2 启动的时机</h1><p>上篇<a href="/2018/05/31/Init进程/" title="Init进程">Init进程</a>中我们知道Zygote进程是由Init进程启动的，那么到底是在什么时候启动的呢？我们现在追踪下源码。<br>在Init进程的初始化过程中会解析init.rc文件，从文件中我们可以看出init.rc会根据ro.zygote属性来加载哪个文件，下面是我获取的公司的6.0系统的板子属性。</p>
@@ -531,10 +549,10 @@
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
+            Inhaltsverzeichnis
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
+            Übersicht
           </li>
         </ul>
       
@@ -558,8 +576,8 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
-                    <span class="site-state-item-name">posts</span>
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">Artikel</span>
                   </a>
                 </div>
               
@@ -582,7 +600,7 @@
                       
                     
                     <span class="site-state-item-count">5</span>
-                    <span class="site-state-item-name">categories</span>
+                    <span class="site-state-item-name">Kategorien</span>
                   </a>
                 </div>
               
@@ -599,7 +617,7 @@
                       
                     
                     <span class="site-state-item-count">2</span>
-                    <span class="site-state-item-name">tags</span>
+                    <span class="site-state-item-name">Tags</span>
                   </a>
                 </div>
               
@@ -668,7 +686,7 @@
 
 
 
-  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
 
 
 
