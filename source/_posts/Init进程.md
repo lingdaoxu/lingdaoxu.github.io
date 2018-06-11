@@ -8,55 +8,180 @@ date: 2018-05-31 14:32:00
 # 一.概述
 Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是**一个守护进程**。
 
-在介绍Init进程前先简单的介绍下Android的启动过程
-# 1.1 bootloader引导
-# 1.1.1 什么是bootloader引导
-当我们按下手机的电源键时，最先运行的就是bootloader。bootloader主要作用就是初始化基本的硬件设备（CPU,内存，Flash等）并且通过建立内存空间的映射，为装载linux内核准备好适合的环境。内核装载完毕，bootloader将会从内存中清除。
 
-# 1.1.2 Fastboot模式
-Fastboot是Android设计的一套通过usb来更新手机分区映像的协议。
-
-# 1.1.3 Recovery模式
-Android特有的升级系统。利用该模式可以进行恢复出厂设置，执行ota、补丁和固件升级。进入到Recovery模式实际上就是进入了一个文字模式的Linux
-
-# 1.2 装载和启动Linux内核
-Android的boot.img存放的就是Linux的内核和一个根文件系统。上面的bootloader会把boot.img映像装载进内存。然后Linux内核会执行整个系统的初始化，完成整个后装载整个根文件系统，最后启动Init进程
-
-> 什么是根文件系统？
-根文件系统是Linux系统一种特殊的文件系统，Android是基于Linux的，当然也有根文件系统。android的根文件系统是基于busybox实现的。
-
-
-# 1.3 启动android系统
-
-android系统的启动可以更加详细的分为以下几个阶段
-
-# 1.3.1 启动Init进程
-Init进程是系统启动的**第一个进程**。在Init的启动过程中会解析Linux的配置脚本init.rc文件、加载android的**文件系统**、**创建系统目录**、**初始化属性系统**、**启动android系统重要的守护进程**（USB守护进程、adb守护进程、vold守护进程、rild守护进程）。
-
-Init作为守护进程的作用：修改属性请求、重启崩溃的进程等操作。
-
-# 1.3.2 启动ServiceManager
-由init启动。管理binder服务，负责binder的注册和查找。
-
-# 1.3.3 启动Zygote进程
-Init进程初始化结束时会启动Zygote进程。Zygote进程负责fork应用进程。是所有应用进程的父进程。
-
-Zygote进程初始化时会创建Dalivik虚拟机、预装载系统的资源文件和Java类。从Zygote中fork的进程都会继承和共享这些预加载的资源。
-
-启动结束后，转为守护进程来响应应用建立的请求。
-
-# 1.3.4 启动SystemService
-SystemService是Zygote进程fork的第一个进程，也是android系统的核心进程。在SystemService中运行这android大部分的binder服务。
-
-首先会启动SensorService,接着是ActivityManagerService（AMS）,WindowsManagerService（WMS）,PackagerManagerService(PKMS)等服务。
-
-# 1.3.5 启动Launcher
-SystemServer加载完所有的服务后，最后会调用AMS中的systemReady()方法。在这个方法的执行过程中会发出Intent(android.intent.category.Home).凡是响应这个Intent的应用都会启动起来（这个流程我们到时候在AMS的分析部分会重点追踪整个过程），这边要跟开机广播区别开来。
 
 # 二.Init进程的初始化过程
+
 Init进程的源码位于\system\core\init\下。程序的入口函数main()位于init.cpp中。
 
 # 2.1 main函数的流程
+
+```cpp
+int main(int argc, char** argv) {
+    //2.1.1 选项启动程序
+    if (!strcmp(basename(argv[0]), "ueventd")) {
+        return ueventd_main(argc, argv);
+    }
+
+    if (!strcmp(basename(argv[0]), "watchdogd")) {
+        return watchdogd_main(argc, argv);
+    }
+	
+    //2.1.2 设置进程创建的文件的属性
+    // Clear the umask.
+    umask(0);
+
+    add_environment("PATH", _PATH_DEFPATH);
+
+    //2.1.3 创建目录和挂载文件系统
+    bool is_first_stage = (argc == 1) || (strcmp(argv[1], "--second-stage") != 0);
+	
+    // Get the basic filesystem setup we need put together in the initramdisk
+    // on / and then we'll let the rc file figure out the rest.
+    if (is_first_stage) {
+        mount("tmpfs", "/dev", "tmpfs", MS_NOSUID, "mode=0755");
+        mkdir("/dev/pts", 0755);
+        mkdir("/dev/socket", 0755);
+        mount("devpts", "/dev/pts", "devpts", 0, NULL);
+        mount("proc", "/proc", "proc", 0, NULL);
+        mount("sysfs", "/sys", "sysfs", 0, NULL);
+    }
+
+    //2.1.4 初始化log系统
+    // We must have some place other than / to create the device nodes for
+    // kmsg and null, otherwise we won't be able to remount / read-only
+    // later on. Now that tmpfs is mounted on /dev, we can actually talk
+    // to the outside world.
+    open_devnull_stdio();
+    klog_init();
+    klog_set_level(KLOG_NOTICE_LEVEL);
+
+    NOTICE("init%s started!\n", is_first_stage ? "" : " second stage");
+	
+    //2.1.5 初始化属性系统
+    if (!is_first_stage) {
+        // Indicate that booting is in progress to background fw loaders, etc.
+        close(open("/dev/.booting", O_WRONLY | O_CREAT | O_CLOEXEC, 0000));
+
+        property_init();
+
+        // If arguments are passed both on the command line and in DT,
+        // properties set in DT always have priority over the command-line ones.
+        process_kernel_dt();
+        process_kernel_cmdline();
+
+        // Propogate the kernel variables to internal variables
+        // used by init as well as the current required properties.
+        export_kernel_boot_props();
+    }
+
+    //2.1.6 初始化SELinux内核
+    // Set up SELinux, including loading the SELinux policy if we're in the kernel domain.
+    selinux_initialize(is_first_stage);
+
+    // If we're in the kernel domain, re-exec init to transition to the init domain now
+    // that the SELinux policy has been loaded.
+    if (is_first_stage) {
+        if (restorecon("/init") == -1) {
+            ERROR("restorecon failed: %s\n", strerror(errno));
+            security_failure();
+        }
+        char* path = argv[0];
+        char* args[] = { path, const_cast<char*>("--second-stage"), nullptr };
+        if (execv(path, args) == -1) {
+            ERROR("execv(\"%s\") failed: %s\n", path, strerror(errno));
+            security_failure();
+        }
+    }
+
+    // These directories were necessarily created before initial policy load
+    // and therefore need their security context restored to the proper value.
+    // This must happen before /dev is populated by ueventd.
+    INFO("Running restorecon...\n");
+    restorecon("/dev");
+    restorecon("/dev/socket");
+    restorecon("/dev/__properties__");
+    restorecon_recursive("/sys");
+
+    epoll_fd = epoll_create1(EPOLL_CLOEXEC);
+    if (epoll_fd == -1) {
+        ERROR("epoll_create1 failed: %s\n", strerror(errno));
+        exit(1);
+    }
+
+    // 2.1.7 初始化子进程退出的信号处理过程
+    signal_handler_init();
+	
+    //2.1.8 设置系统属性的默认值
+    property_load_boot_defaults();
+	
+	//2.1.9 启动属性服务（sockect）
+    start_property_service();
+
+    //2.1.10 解析init.rc文件
+    init_parse_config_file("/init.rc");
+	
+    //2.1.11 初始化执行列表action_queue
+    action_for_each_trigger("early-init", action_add_queue_tail);
+
+    // Queue an action that waits for coldboot done so we know ueventd has set up all of /dev...
+    queue_builtin_action(wait_for_coldboot_done_action, "wait_for_coldboot_done");
+    // ... so that we can start queuing up actions that require stuff from /dev.
+    queue_builtin_action(mix_hwrng_into_linux_rng_action, "mix_hwrng_into_linux_rng");
+    queue_builtin_action(keychord_init_action, "keychord_init");
+    queue_builtin_action(console_init_action, "console_init");
+
+    // Trigger all the boot actions to get us started.
+    action_for_each_trigger("init", action_add_queue_tail);
+
+    // Repeat mix_hwrng_into_linux_rng in case /dev/hw_random or /dev/random
+    // wasn't ready immediately after wait_for_coldboot_done
+    queue_builtin_action(mix_hwrng_into_linux_rng_action, "mix_hwrng_into_linux_rng");
+
+    // Don't mount filesystems or start core system services in charger mode.
+    char bootmode[PROP_VALUE_MAX];
+    if (property_get("ro.bootmode", bootmode) > 0 && strcmp(bootmode, "charger") == 0) {
+        action_for_each_trigger("charger", action_add_queue_tail);
+    } else {
+        action_for_each_trigger("late-init", action_add_queue_tail);
+    }
+
+    // Run all property triggers based on current state of the properties.
+    queue_builtin_action(queue_property_triggers_action, "queue_property_triggers");
+    //2.1.12 无限循环执行
+    while (true) {
+        if (!waiting_for_exec) {
+            execute_one_command();
+            restart_processes();
+        }
+
+        int timeout = -1;
+        if (process_needs_restart) {
+            timeout = (process_needs_restart - gettime()) * 1000;
+            if (timeout < 0)
+                timeout = 0;
+        }
+
+        if (!action_queue_empty() || cur_action) {
+            timeout = 0;
+        }
+
+        bootchart_sample(&timeout);
+
+        epoll_event ev;
+        int nr = TEMP_FAILURE_RETRY(epoll_wait(epoll_fd, &ev, 1, timeout));
+        if (nr == -1) {
+            ERROR("epoll_wait failed: %s\n", strerror(errno));
+        } else if (nr == 1) {
+            ((void (*)()) ev.data.ptr)();
+        }
+    }
+
+    return 0;
+}
+```
+
+
 # 2.1.1 选择启动程序
 
 因为Init和ueventd和watchdogd守护进程的代码存在大量的代码重合，所以直接合并到一个文件中，通过参数来判断执行那个守护进程。
@@ -551,11 +676,24 @@ static void restart_service_if_needed(struct service *svc) {
 
 # 3.1 init.rc文件格式
 
-init.rc文件是以块为单位，主要分为两类：一是行为:action,以on开头;二是服务:service，以service开头。注释以#开头。
-无论是action还是service的执行顺序都不是以文件中的编排顺序执行的，执行与否和是否执行都是Init进程中决定的。
+init.rc文件是以块为单位，主要分为两类：
+- 动作:action,以on开头;
+- 服务:service，以service开头。
+- 选项:Options
+- 命令:Commands 
+注释以#开头。无论是action还是service的执行顺序都不是以文件中的编排顺序执行的，**执行与否和是否执行都是Init进程中决定的**。
 
 # 3.1.1 action
+
+格式：
+on [trigger] 触发条件
+   [Command1]
+   [Command2]
+   [Command3]
+
 在on后面紧跟的字符串是action的触发器，触发器后面的是命令列表，每一行都是一个命令。可以通过 trigger 触发器字符串（trigger late-init） 来触发。
+
+当相应的事件发生后，系统会对rc文件中的各个 trigger 进行匹配，匹配到的action会被加入到 命令执行列表的尾部，已经在队伍中的action不会被重复添加。
 
 触发器几种类别
 - on early-init; 在初始化早期阶段触发；
@@ -582,6 +720,12 @@ on load_persist_props_action
 
 
 # 3.1.2 service
+
+格式：
+service [name:名称] [pathname：路径] [argument：参数]
+	[option]
+	[option]
+
 在service后面是服务的名称，我们可以使用“start”命令加服务名称来启动一个服务（start logd）。名称后面的则是执行文件路径和执行参数。然后下面的行称为选项，每一行都是一个选项。例如class表示服务的类别，我们可以通过class_start来一次性启动一组服务。
 ```
 service ueventd /sbin/ueventd
