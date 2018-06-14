@@ -6,7 +6,7 @@ categories:
 date: 2018-05-31 14:32:00
 ---
 # 一.概述
-Init进程是内核启动后创建的第一个用户进程，地位非常的重要。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是**一个守护进程**。
+Init进程是Linux系统中用户空间的第一个进程，Android是基于Linux内核的，所以init也是Android系统中用户空间的第一个进程，进程号是1。在Init初始化的过程中会启动很多重要的守护进程，当然Init本身也是**一个守护进程**。
 
 
 
@@ -18,7 +18,7 @@ Init进程的源码位于\system\core\init\下。程序的入口函数main()位�
 
 ```cpp
 int main(int argc, char** argv) {
-    //2.1.1 选项启动程序
+    //2.1.1 选择启动程序
     if (!strcmp(basename(argv[0]), "ueventd")) {
         return ueventd_main(argc, argv);
     }
@@ -459,7 +459,7 @@ static void restart_service_if_needed(struct service *svc) {
 ```cpp
     // Starting a service removes it from the disabled or reset state and
     // immediately takes it out of the restarting state if it was in there.
-	//这四个表示都是有启动相关的所以直接去掉
+	//这四个都是跟启动相关的所以直接去掉
     svc->flags &= (~(SVC_DISABLED|SVC_RESTARTING|SVC_RESET|SVC_RESTART|SVC_DISABLED_START));
     svc->time_started = 0;
 	
