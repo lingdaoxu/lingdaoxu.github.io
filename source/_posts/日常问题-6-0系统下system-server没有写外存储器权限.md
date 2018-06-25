@@ -3,17 +3,23 @@ author: 道墟
 date: 2018-06-14 17:42:20
 tags:
 ---
+
+# 问题描述
 上篇blog我们讲了怎么添加系统服务来保存日志的解决方案，然后领导很开心的给加了个需求：正常情况下不抓取日志，只有当U盘插入的时候检测到有特定的文件夹的时候才开始写日志到U盘里面去，方便测试人员捕获日志。刚拿到需求的时候想了下很简单，接收下U盘挂载广播就要可以了，确实在4.4上一切顺利，很快就完成任务了，然后今天移植到6.0系统发现无法再U盘上创建和写入文件。下面来追踪下解决的思路。
 
-先从我们自定义的服务SystemLogService入手，SystemLogService是在SystemServer中初始化的，所以是属于system_server进程，所以初步怀疑是system_server进程没有权限导致的。下面我们来看看system_server进程的相信信息
 
-首先通过  ps |grep system_server 命令来获取进程号
+
+# 解决方案
+
+先从我们自定义的服务SystemLogService入手，SystemLogService是在SystemServer中初始化的，所以是属于system_server进程，所以初步怀疑是system_server进程没有权限导致的。下面我们来看看system_server进程的相关信息
+
+# 通过  ps |grep system_server 命令来获取进程号
 
 ```
 system    496   212   2023356 131972          0 0000000000 S system_server
 ```
 
-然后进入到 proc 中查看虚拟文件系统查看进程目录
+# 进入到 proc 中查看虚拟文件系统查看进程目录
 
 ```
 ## 496 是进程号
@@ -62,7 +68,7 @@ dr-xr-xr-x system   system            2013-01-18 16:50 task
 -r--r--r-- system   system          0 2013-01-18 16:50 wchan
 ```
 
-查看status文件
+# 查看status文件
 ```
 root@rk3399_m_stbvr:/proc/496 # cat status
 Name:   system_server
@@ -111,9 +117,36 @@ voluntary_ctxt_switches:        3557
 nonvoluntary_ctxt_switches:     1410
 ```
 
+# 查看U盘的所属用户组
+
+因为这边挂载了两个文件系统，所以都需要查看
+
+/mnt/media_rw/E844-FF71
+```
+root@rk3399_m_stbvr:/mnt/media_rw/E844-FF71 # ls -la
+-rwxrwx--- media_rw media_rw 17127363 2013-05-03 16:27 8ch_voices_id_21_ddp.h264
+-rwxrwx--- media_rw media_rw 34050184 2013-05-03 16:19 8ch_voices_id_21_ddp_DVB_mpeg2_25fps.trp
+drwxrwx--- media_rw media_rw          2018-06-11 18:11 Android
+drwxrwx--- media_rw media_rw          2018-06-11 18:06 LOST.DIR
+drwxrwx--- media_rw media_rw          2018-06-14 15:55 System Volume Information
+drwxrwx--- media_rw media_rw          2018-06-14 18:10 logcat
+drwxrwx--- media_rw media_rw          2018-06-12 18:29 鏈€鏂版祴璇曚娇鐢ㄧ殑鐮佹祦
+```
 
 
-查看所属用户组具备的权限
+/storage/E844-FF71
+```
+root@rk3399_m_stbvr:/storage/E844-FF71 # ls -la
+-rwxrwx--x root     sdcard_rw 17127363 2013-05-03 16:27 8ch_voices_id_21_ddp.h264
+-rwxrwx--x root     sdcard_rw 34050184 2013-05-03 16:19 8ch_voices_id_21_ddp_DVB_mpeg2_25fps.trp
+drwxrwx--x root     sdcard_rw          2018-06-11 18:11 Android
+drwxrwx--x root     sdcard_rw          2018-06-11 18:06 LOST.DIR
+drwxrwx--x root     sdcard_rw          2018-06-14 15:55 System Volume Information
+drwxrwx--x root     sdcard_rw          2018-06-14 18:10 logcat
+drwxrwx--x root     sdcard_rw          2018-06-12 18:29 鏈€鏂版祴璇曚娇鐢ㄧ殑鐮佹祦
+```
+
+# 查看所属用户组对应的数值
 
 \system\core\include\private\android_filesystem_config.h
 ```
@@ -194,36 +227,31 @@ nonvoluntary_ctxt_switches:     1410
 #define AID_SHARED_GID_END   59999 /* start of gids for apps in each user to share */
 ```
 
+这边我们可以查找 sdcard_rw 对应的是 AID_SDCARD_RW 1015,media_rw对应的是 AID_MEDIA_RW 1023
 
+# 修改 system_server 的所属用户组
 
+system_server是由ZygoteInit类负责初始化和启动的，frameworks/base/core/java/com/android/internal/os/ZygoteInit.java文件中。在startSystemServer方法中启动sysetm_server时通过 --setgroups 为其设置了所属用户组，代码如下
 
-/mnt/media_rw/E844-FF71
-
+```java
+        /* Hardcoded command line to start the system server */
+        String args[] = {
+            "--setuid=1000",
+            "--setgid=1000",
+            "--setgroups=1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1015,1023,1018,1021,1032,3001,3002,3003,3006,3007",
+            "--capabilities=" + capabilities + "," + capabilities,
+            "--nice-name=system_server",
+            "--runtime-args",
+            "com.android.server.SystemServer",
+        };
 ```
-root@rk3399_m_stbvr:/mnt/media_rw/E844-FF71 # ls -la
--rwxrwx--- media_rw media_rw 17127363 2013-05-03 16:27 8ch_voices_id_21_ddp.h264
--rwxrwx--- media_rw media_rw 34050184 2013-05-03 16:19 8ch_voices_id_21_ddp_DVB_mpeg2_25fps.trp
-drwxrwx--- media_rw media_rw          2018-06-11 18:11 Android
-drwxrwx--- media_rw media_rw          2018-06-11 18:06 LOST.DIR
-drwxrwx--- media_rw media_rw          2018-06-14 15:55 System Volume Information
-drwxrwx--- media_rw media_rw          2018-06-14 18:10 logcat
-drwxrwx--- media_rw media_rw          2018-06-12 18:29 鏈€鏂版祴璇曚娇鐢ㄧ殑鐮佹祦
-```
+在这里添加对应的用户组
 
 
-/storage/E844-FF71
+# 总结
+解决的步骤如下
+- 查看进程当前所属的组
+- 查看需要的用户组
+- 查看对应用户组的值
+- 修改启动参数添加组
 
-```
-root@rk3399_m_stbvr:/storage/E844-FF71 # ls -la
--rwxrwx--x root     sdcard_rw 17127363 2013-05-03 16:27 8ch_voices_id_21_ddp.h264
--rwxrwx--x root     sdcard_rw 34050184 2013-05-03 16:19 8ch_voices_id_21_ddp_DVB_mpeg2_25fps.trp
-drwxrwx--x root     sdcard_rw          2018-06-11 18:11 Android
-drwxrwx--x root     sdcard_rw          2018-06-11 18:06 LOST.DIR
-drwxrwx--x root     sdcard_rw          2018-06-14 15:55 System Volume Information
-drwxrwx--x root     sdcard_rw          2018-06-14 18:10 logcat
-drwxrwx--x root     sdcard_rw          2018-06-12 18:29 鏈€鏂版祴璇曚娇鐢ㄧ殑鐮佹祦
-```
-
-
-https://blog.csdn.net/e_one/article/details/80620423
-https://blog.csdn.net/smilefyx/article/details/78880428
