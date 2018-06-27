@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="问题描述上篇blog我们讲了怎么添加系统服务来保存日志的解决方案，然后领导很开心的给加了个需求：正常情况下不抓取日志，只有当U盘插入的时候检测到有特定的文件夹的时候才开始写日志到U盘里面去，方便测试人员捕获日志。刚拿到需求的时候想了下很简单，接收下U盘挂载广播就要可以了，确实在4.4上一切顺利，很快就完成任务了，然后今天移植到6.0系统发现无法再U盘上创建和写入文件。下面来追踪下解决的思路。 解决">
+<meta property="og:type" content="article">
+<meta property="og:title" content="日常问题:6.0系统下system_server没有写外存储器权限">
+<meta property="og:url" content="http://yoursite.com/2018/06/14/日常问题-6-0系统下system-server没有写外存储器权限/index.html">
+<meta property="og:site_name" content="道墟">
+<meta property="og:description" content="问题描述上篇blog我们讲了怎么添加系统服务来保存日志的解决方案，然后领导很开心的给加了个需求：正常情况下不抓取日志，只有当U盘插入的时候检测到有特定的文件夹的时候才开始写日志到U盘里面去，方便测试人员捕获日志。刚拿到需求的时候想了下很简单，接收下U盘挂载广播就要可以了，确实在4.4上一切顺利，很快就完成任务了，然后今天移植到6.0系统发现无法再U盘上创建和写入文件。下面来追踪下解决的思路。 解决">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-15T01:34:26.355Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="日常问题:6.0系统下system_server没有写外存储器权限">
+<meta name="twitter:description" content="问题描述上篇blog我们讲了怎么添加系统服务来保存日志的解决方案，然后领导很开心的给加了个需求：正常情况下不抓取日志，只有当U盘插入的时候检测到有特定的文件夹的时候才开始写日志到U盘里面去，方便测试人员捕获日志。刚拿到需求的时候想了下很简单，接收下U盘挂载广播就要可以了，确实在4.4上一切顺利，很快就完成任务了，然后今天移植到6.0系统发现无法再U盘上创建和写入文件。下面来追踪下解决的思路。 解决">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/14/日常问题-6-0系统下system-server没有写外存储器权限/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>日常问题:6.0系统下system_server没有写外存储器权限 | 道墟</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">道墟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">初九，潜龙勿用</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/14/日常问题-6-0系统下system-server没有写外存储器权限/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="道墟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道墟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">日常问题:6.0系统下system_server没有写外存储器权限
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+
+              
+                
+              
+
+              <time title="Post created: 2018-06-14 17:42:20" itemprop="dateCreated datePublished" datetime="2018-06-14T17:42:20+08:00">2018-06-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Updated at: 2018-06-15 09:34:26" itemprop="dateModified" datetime="2018-06-15T09:34:26+08:00">2018-06-15</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>上篇blog我们讲了怎么添加系统服务来保存日志的解决方案，然后领导很开心的给加了个需求：正常情况下不抓取日志，只有当U盘插入的时候检测到有特定的文件夹的时候才开始写日志到U盘里面去，方便测试人员捕获日志。刚拿到需求的时候想了下很简单，接收下U盘挂载广播就要可以了，确实在4.4上一切顺利，很快就完成任务了，然后今天移植到6.0系统发现无法再U盘上创建和写入文件。下面来追踪下解决的思路。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>先从我们自定义的服务SystemLogService入手，SystemLogService是在SystemServer中初始化的，所以是属于system_server进程，所以初步怀疑是system_server进程没有权限导致的。下面我们来看看system_server进程的相关信息</p>
+<h1 id="通过-ps-grep-system-server-命令来获取进程号"><a href="#通过-ps-grep-system-server-命令来获取进程号" class="headerlink" title="通过  ps |grep system_server 命令来获取进程号"></a>通过  ps |grep system_server 命令来获取进程号</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">system    496   212   2023356 131972          0 0000000000 S system_server</span><br></pre></td></tr></table></figure>
+<h1 id="进入到-proc-中查看虚拟文件系统查看进程目录"><a href="#进入到-proc-中查看虚拟文件系统查看进程目录" class="headerlink" title="进入到 proc 中查看虚拟文件系统查看进程目录"></a>进入到 proc 中查看虚拟文件系统查看进程目录</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">## 496 是进程号</span><br><span class="line">root@rk3399_m_stbvr:/ # cd proc/496/</span><br><span class="line">root@rk3399_m_stbvr:/proc/496 # ls -la</span><br><span class="line">dr-xr-xr-x system   system            2013-01-18 16:50 attr</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 auxv</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 cgroup</span><br><span class="line">--w------- system   system          0 2018-06-14 17:59 clear_refs</span><br><span class="line">-r--r--r-- system   system          0 2013-01-18 16:50 cmdline</span><br><span class="line">-rw-r--r-- system   system          0 2013-01-18 16:50 comm</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 cpuset</span><br><span class="line">lrwxrwxrwx system   system            2018-06-14 17:59 cwd -&gt; /</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 environ</span><br><span class="line">lrwxrwxrwx system   system            2018-06-14 17:59 exe -&gt; /system/bin/app_process64</span><br><span class="line">dr-x------ system   system            2013-01-18 16:50 fd</span><br><span class="line">dr-x------ system   system            2018-06-14 17:59 fdinfo</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 io</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 limits</span><br><span class="line">-rw-r--r-- system   system          0 2018-06-14 17:59 loginuid</span><br><span class="line">dr-x------ system   system            2018-06-14 17:59 map_files</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 maps</span><br><span class="line">-rw------- system   system          0 2018-06-14 17:59 mem</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 mountinfo</span><br><span class="line">-r--r--r-- system   system          0 2013-01-18 16:50 mounts</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 mountstats</span><br><span class="line">dr-xr-xr-x system   system            2013-01-18 16:50 net</span><br><span class="line">dr-x--x--x system   system            2018-06-14 17:59 ns</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 oom_adj</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 oom_score</span><br><span class="line">-r-------- system   system          0 2013-01-18 16:50 oom_score_adj</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 pagemap</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 personality</span><br><span class="line">lrwxrwxrwx system   system            2018-06-14 17:59 root -&gt; /</span><br><span class="line">-rw-r--r-- system   system          0 2018-06-14 17:59 sched</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 schedstat</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 sessionid</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:42 smaps</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 stack</span><br><span class="line">-r--r--r-- system   system          0 2013-01-18 16:50 stat</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 statm</span><br><span class="line">-r--r--r-- system   system          0 2018-06-14 17:59 status</span><br><span class="line">-r-------- system   system          0 2018-06-14 17:59 syscall</span><br><span class="line">dr-xr-xr-x system   system            2013-01-18 16:50 task</span><br><span class="line">-rw-rw-rw- system   system          0 2018-06-14 17:59 timerslack_ns</span><br><span class="line">-r--r--r-- system   system          0 2013-01-18 16:50 wchan</span><br></pre></td></tr></table></figure>
+<h1 id="查看status文件"><a href="#查看status文件" class="headerlink" title="查看status文件"></a>查看status文件</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">root@rk3399_m_stbvr:/proc/496 # cat status</span><br><span class="line">Name:   system_server</span><br><span class="line">State:  S (sleeping)</span><br><span class="line">Tgid:   496</span><br><span class="line">Ngid:   0</span><br><span class="line">Pid:    496</span><br><span class="line">PPid:   212</span><br><span class="line">TracerPid:      0</span><br><span class="line">Uid:    1000    1000    1000    1000</span><br><span class="line">Gid:    1000    1000    1000    1000</span><br><span class="line">FDSize: 512</span><br><span class="line"># 1015 和 1023 原来是没有的，后面修改后才有的</span><br><span class="line">Groups: 1001 1002 1003 1004 1005 1006 1007 1008 1009 1010 1015 1018 1021 1023 1032 3001 3002 3003 3006 3007</span><br><span class="line">VmPeak:  2155712 kB</span><br><span class="line">VmSize:  2023356 kB</span><br><span class="line">VmLck:         0 kB</span><br><span class="line">VmPin:         0 kB</span><br><span class="line">VmHWM:    133496 kB</span><br><span class="line">VmRSS:    131172 kB</span><br><span class="line">VmData:    93112 kB</span><br><span class="line">VmStk:      8196 kB</span><br><span class="line">VmExe:        16 kB</span><br><span class="line">VmLib:    101224 kB</span><br><span class="line">VmPTE:       676 kB</span><br><span class="line">VmPMD:        28 kB</span><br><span class="line">VmSwap:        0 kB</span><br><span class="line">Threads:        76</span><br><span class="line">SigQ:   2/7258</span><br><span class="line">SigPnd: 0000000000000000</span><br><span class="line">ShdPnd: 0000000000000000</span><br><span class="line">SigBlk: 0000000000001204</span><br><span class="line">SigIgn: 0000000000000000</span><br><span class="line">SigCgt: 00000002000094f8</span><br><span class="line">CapInh: 0000000000000000</span><br><span class="line">CapPrm: 0000001007813c20</span><br><span class="line">CapEff: 0000001007813c20</span><br><span class="line">CapBnd: 0000000000000000</span><br><span class="line">CapAmb: 0000000000000000</span><br><span class="line">Seccomp:        0</span><br><span class="line">Cpus_allowed:   3f</span><br><span class="line">Cpus_allowed_list:      0-5</span><br><span class="line">Mems_allowed:   1</span><br><span class="line">Mems_allowed_list:      0</span><br><span class="line">voluntary_ctxt_switches:        3557</span><br><span class="line">nonvoluntary_ctxt_switches:     1410</span><br></pre></td></tr></table></figure>
+<h1 id="查看U盘的所属用户组"><a href="#查看U盘的所属用户组" class="headerlink" title="查看U盘的所属用户组"></a>查看U盘的所属用户组</h1><p>因为这边挂载了两个文件系统，所以都需要查看</p>
+<p>/mnt/media_rw/E844-FF71<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@rk3399_m_stbvr:/mnt/media_rw/E844-FF71 # ls -la</span><br><span class="line">-rwxrwx--- media_rw media_rw 17127363 2013-05-03 16:27 8ch_voices_id_21_ddp.h264</span><br><span class="line">-rwxrwx--- media_rw media_rw 34050184 2013-05-03 16:19 8ch_voices_id_21_ddp_DVB_mpeg2_25fps.trp</span><br><span class="line">drwxrwx--- media_rw media_rw          2018-06-11 18:11 Android</span><br><span class="line">drwxrwx--- media_rw media_rw          2018-06-11 18:06 LOST.DIR</span><br><span class="line">drwxrwx--- media_rw media_rw          2018-06-14 15:55 System Volume Information</span><br><span class="line">drwxrwx--- media_rw media_rw          2018-06-14 18:10 logcat</span><br><span class="line">drwxrwx--- media_rw media_rw          2018-06-12 18:29 鏈€鏂版祴璇曚娇鐢ㄧ殑鐮佹祦</span><br></pre></td></tr></table></figure></p>
+<p>/storage/E844-FF71<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@rk3399_m_stbvr:/storage/E844-FF71 # ls -la</span><br><span class="line">-rwxrwx--x root     sdcard_rw 17127363 2013-05-03 16:27 8ch_voices_id_21_ddp.h264</span><br><span class="line">-rwxrwx--x root     sdcard_rw 34050184 2013-05-03 16:19 8ch_voices_id_21_ddp_DVB_mpeg2_25fps.trp</span><br><span class="line">drwxrwx--x root     sdcard_rw          2018-06-11 18:11 Android</span><br><span class="line">drwxrwx--x root     sdcard_rw          2018-06-11 18:06 LOST.DIR</span><br><span class="line">drwxrwx--x root     sdcard_rw          2018-06-14 15:55 System Volume Information</span><br><span class="line">drwxrwx--x root     sdcard_rw          2018-06-14 18:10 logcat</span><br><span class="line">drwxrwx--x root     sdcard_rw          2018-06-12 18:29 鏈€鏂版祴璇曚娇鐢ㄧ殑鐮佹祦</span><br></pre></td></tr></table></figure></p>
+<h1 id="查看所属用户组对应的数值"><a href="#查看所属用户组对应的数值" class="headerlink" title="查看所属用户组对应的数值"></a>查看所属用户组对应的数值</h1><p>\system\core\include\private\android_filesystem_config.h<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#define AID_ROOT             0  /* traditional unix root user */</span><br><span class="line"></span><br><span class="line">#define AID_SYSTEM        1000  /* system server */</span><br><span class="line"></span><br><span class="line">#define AID_RADIO         1001  /* telephony subsystem, RIL */</span><br><span class="line">#define AID_BLUETOOTH     1002  /* bluetooth subsystem */</span><br><span class="line">#define AID_GRAPHICS      1003  /* graphics devices */</span><br><span class="line">#define AID_INPUT         1004  /* input devices */</span><br><span class="line">#define AID_AUDIO         1005  /* audio devices */</span><br><span class="line">#define AID_CAMERA        1006  /* camera devices */</span><br><span class="line">#define AID_LOG           1007  /* log devices */</span><br><span class="line">#define AID_COMPASS       1008  /* compass device */</span><br><span class="line">#define AID_MOUNT         1009  /* mountd socket */</span><br><span class="line">#define AID_WIFI          1010  /* wifi subsystem */</span><br><span class="line">#define AID_ADB           1011  /* android debug bridge (adbd) */</span><br><span class="line">#define AID_INSTALL       1012  /* group for installing packages */</span><br><span class="line">#define AID_MEDIA         1013  /* mediaserver process */</span><br><span class="line">#define AID_DHCP          1014  /* dhcp client */</span><br><span class="line">#define AID_SDCARD_RW     1015  /* external storage write access */</span><br><span class="line">#define AID_VPN           1016  /* vpn system */</span><br><span class="line">#define AID_KEYSTORE      1017  /* keystore subsystem */</span><br><span class="line">#define AID_USB           1018  /* USB devices */</span><br><span class="line">#define AID_DRM           1019  /* DRM server */</span><br><span class="line">#define AID_MDNSR         1020  /* MulticastDNSResponder (service discovery) */</span><br><span class="line">#define AID_GPS           1021  /* GPS daemon */</span><br><span class="line">#define AID_UNUSED1       1022  /* deprecated, DO NOT USE */</span><br><span class="line">#define AID_MEDIA_RW      1023  /* internal media storage write access */</span><br><span class="line">#define AID_MTP           1024  /* MTP USB driver access */</span><br><span class="line">#define AID_UNUSED2       1025  /* deprecated, DO NOT USE */</span><br><span class="line">#define AID_DRMRPC        1026  /* group for drm rpc */</span><br><span class="line">#define AID_NFC           1027  /* nfc subsystem */</span><br><span class="line">#define AID_SDCARD_R      1028  /* external storage read access */</span><br><span class="line">#define AID_CLAT          1029  /* clat part of nat464 */</span><br><span class="line">#define AID_LOOP_RADIO    1030  /* loop radio devices */</span><br><span class="line">#define AID_MEDIA_DRM     1031  /* MediaDrm plugins */</span><br><span class="line">#define AID_PACKAGE_INFO  1032  /* access to installed package details */</span><br><span class="line">#define AID_SDCARD_PICS   1033  /* external storage photos access */</span><br><span class="line">#define AID_SDCARD_AV     1034  /* external storage audio/video access */</span><br><span class="line">#define AID_SDCARD_ALL    1035  /* access all users external storage */</span><br><span class="line">#define AID_LOGD          1036  /* log daemon */</span><br><span class="line">#define AID_SHARED_RELRO  1037  /* creator of shared GNU RELRO files */</span><br><span class="line"></span><br><span class="line">#define AID_SHELL         2000  /* adb and debug shell user */</span><br><span class="line">#define AID_CACHE         2001  /* cache access */</span><br><span class="line">#define AID_DIAG          2002  /* access to diagnostic resources */</span><br><span class="line"></span><br><span class="line">/* The range 2900-2999 is reserved for OEM, and must never be</span><br><span class="line"> * used here */</span><br><span class="line">#define AID_OEM_RESERVED_START 2900</span><br><span class="line">#define AID_OEM_RESERVED_END   2999</span><br><span class="line"></span><br><span class="line">/* The 3000 series are intended for use as supplemental group id&apos;s only.</span><br><span class="line"> * They indicate special Android capabilities that the kernel is aware of. */</span><br><span class="line">#define AID_NET_BT_ADMIN  3001  /* bluetooth: create any socket */</span><br><span class="line">#define AID_NET_BT        3002  /* bluetooth: create sco, rfcomm or l2cap sockets */</span><br><span class="line">#define AID_INET          3003  /* can create AF_INET and AF_INET6 sockets */</span><br><span class="line">#define AID_NET_RAW       3004  /* can create raw INET sockets */</span><br><span class="line">#define AID_NET_ADMIN     3005  /* can configure interfaces and routing tables. */</span><br><span class="line">#define AID_NET_BW_STATS  3006  /* read bandwidth statistics */</span><br><span class="line">#define AID_NET_BW_ACCT   3007  /* change bandwidth statistics accounting */</span><br><span class="line">#define AID_NET_BT_STACK  3008  /* bluetooth: access config files */</span><br><span class="line"></span><br><span class="line">#define AID_EVERYBODY     9997  /* shared between all apps in the same profile */</span><br><span class="line">#define AID_MISC          9998  /* access to misc storage */</span><br><span class="line">#define AID_NOBODY        9999</span><br><span class="line"></span><br><span class="line">#define AID_APP          10000  /* first app user */</span><br><span class="line"></span><br><span class="line">#define AID_ISOLATED_START 99000 /* start of uids for fully isolated sandboxed processes */</span><br><span class="line">#define AID_ISOLATED_END   99999 /* end of uids for fully isolated sandboxed processes */</span><br><span class="line"></span><br><span class="line">#define AID_USER        100000  /* offset for uid ranges for each user */</span><br><span class="line"></span><br><span class="line">#define AID_SHARED_GID_START 50000 /* start of gids for apps in each user to share */</span><br><span class="line">#define AID_SHARED_GID_END   59999 /* start of gids for apps in each user to share */</span><br></pre></td></tr></table></figure></p>
+<p>这边我们可以查找 sdcard_rw 对应的是 AID_SDCARD_RW 1015,media_rw对应的是 AID_MEDIA_RW 1023</p>
+<h1 id="修改-system-server-的所属用户组"><a href="#修改-system-server-的所属用户组" class="headerlink" title="修改 system_server 的所属用户组"></a>修改 system_server 的所属用户组</h1><p>system_server是由ZygoteInit类负责初始化和启动的，frameworks/base/core/java/com/android/internal/os/ZygoteInit.java文件中。在startSystemServer方法中启动sysetm_server时通过 –setgroups 为其设置了所属用户组，代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Hardcoded command line to start the system server */</span></span><br><span class="line">String args[] = &#123;</span><br><span class="line">    <span class="string">"--setuid=1000"</span>,</span><br><span class="line">    <span class="string">"--setgid=1000"</span>,</span><br><span class="line">    <span class="string">"--setgroups=1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1015,1023,1018,1021,1032,3001,3002,3003,3006,3007"</span>,</span><br><span class="line">    <span class="string">"--capabilities="</span> + capabilities + <span class="string">","</span> + capabilities,</span><br><span class="line">    <span class="string">"--nice-name=system_server"</span>,</span><br><span class="line">    <span class="string">"--runtime-args"</span>,</span><br><span class="line">    <span class="string">"com.android.server.SystemServer"</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>在这里添加对应的用户组</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>解决的步骤如下</p>
+<ul>
+<li>查看进程当前所属的组</li>
+<li>查看需要的用户组</li>
+<li>查看对应用户组的值</li>
+<li>修改启动参数添加组</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/12/activity启动过程/" rel="next" title="activity启动过程">
+                <i class="fa fa-chevron-left"></i> activity启动过程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/25/adj/" rel="prev" title="adj">
+                adj <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="道墟" />
+            
+              <p class="site-author-name" itemprop="name">道墟</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">14</span>
+                    <span class="site-state-item-name">Artikel</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">Kategorien</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">Tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题描述"><span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过-ps-grep-system-server-命令来获取进程号"><span class="nav-text">通过  ps |grep system_server 命令来获取进程号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#进入到-proc-中查看虚拟文件系统查看进程目录"><span class="nav-text">进入到 proc 中查看虚拟文件系统查看进程目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看status文件"><span class="nav-text">查看status文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看U盘的所属用户组"><span class="nav-text">查看U盘的所属用户组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看所属用户组对应的数值"><span class="nav-text">查看所属用户组对应的数值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改-system-server-的所属用户组"><span class="nav-text">修改 system_server 的所属用户组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">道墟</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
