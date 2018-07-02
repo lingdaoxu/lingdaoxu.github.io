@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="进程隔离android中进程的地址空间是独立的，一个进程不能直接访问另一个进程的地址空间。 #应用程序沙箱在每个应用程序的安装阶段，Android自动为每个应用赋予一个独一无二的UID，通常称作appid，应用执行时就在特定进程内以该UID运行。 系统守护进程和应用程序都是在明确的、恒定的UID运行的，很少有守护进程以root用户（UID=0）运行。这些UID是静态定义在 \system\core">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android沙箱和权限机制">
+<meta property="og:url" content="http://yoursite.com/2018/07/01/android沙箱和权限机制/index.html">
+<meta property="og:site_name" content="道墟">
+<meta property="og:description" content="进程隔离android中进程的地址空间是独立的，一个进程不能直接访问另一个进程的地址空间。 #应用程序沙箱在每个应用程序的安装阶段，Android自动为每个应用赋予一个独一无二的UID，通常称作appid，应用执行时就在特定进程内以该UID运行。 系统守护进程和应用程序都是在明确的、恒定的UID运行的，很少有守护进程以root用户（UID=0）运行。这些UID是静态定义在 \system\core">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-07-02T05:34:03.726Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android沙箱和权限机制">
+<meta name="twitter:description" content="进程隔离android中进程的地址空间是独立的，一个进程不能直接访问另一个进程的地址空间。 #应用程序沙箱在每个应用程序的安装阶段，Android自动为每个应用赋予一个独一无二的UID，通常称作appid，应用执行时就在特定进程内以该UID运行。 系统守护进程和应用程序都是在明确的、恒定的UID运行的，很少有守护进程以root用户（UID=0）运行。这些UID是静态定义在 \system\core">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/01/android沙箱和权限机制/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>android沙箱和权限机制 | 道墟</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">道墟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">初九，潜龙勿用</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/01/android沙箱和权限机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="道墟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道墟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">android沙箱和权限机制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+
+              
+                
+              
+
+              <time title="Post created: 2018-07-01 18:24:52" itemprop="dateCreated datePublished" datetime="2018-07-01T18:24:52+08:00">2018-07-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Updated at: 2018-07-02 13:34:03" itemprop="dateModified" datetime="2018-07-02T13:34:03+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="进程隔离"><a href="#进程隔离" class="headerlink" title="进程隔离"></a>进程隔离</h1><p>android中进程的地址空间是独立的，一个进程不能直接访问另一个进程的地址空间。</p>
+<p>#应用程序沙箱<br>在每个应用程序的安装阶段，Android自动为每个应用赋予一个独一无二的UID，通常称作appid，应用执行时就在特定进程内以该UID运行。</p>
+<p>系统守护进程和应用程序都是在明确的、恒定的UID运行的，很少有守护进程以root用户（UID=0）运行。这些UID是静态定义在 \system\core\include\private\android_filesystem_config.h 文件中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#define AID_ROOT             0  /* traditional unix root user */</span><br><span class="line"></span><br><span class="line">#define AID_SYSTEM        1000  /* system server */</span><br><span class="line"></span><br><span class="line">#define AID_RADIO         1001  /* telephony subsystem, RIL */</span><br><span class="line">#define AID_BLUETOOTH     1002  /* bluetooth subsystem */</span><br><span class="line">#define AID_GRAPHICS      1003  /* graphics devices */</span><br><span class="line">#define AID_INPUT         1004  /* input devices */</span><br><span class="line">#define AID_AUDIO         1005  /* audio devices */</span><br><span class="line">#define AID_CAMERA        1006  /* camera devices */</span><br><span class="line">#define AID_LOG           1007  /* log devices */</span><br><span class="line">#define AID_COMPASS       1008  /* compass device */</span><br><span class="line">#define AID_MOUNT         1009  /* mountd socket */</span><br><span class="line">#define AID_WIFI          1010  /* wifi subsystem */</span><br><span class="line">#define AID_ADB           1011  /* android debug bridge (adbd) */</span><br><span class="line">#define AID_INSTALL       1012  /* group for installing packages */</span><br><span class="line">#define AID_MEDIA         1013  /* mediaserver process */</span><br><span class="line">#define AID_DHCP          1014  /* dhcp client */</span><br><span class="line">#define AID_SDCARD_RW     1015  /* external storage write access */</span><br><span class="line">#define AID_VPN           1016  /* vpn system */</span><br><span class="line">#define AID_KEYSTORE      1017  /* keystore subsystem */</span><br><span class="line">#define AID_USB           1018  /* USB devices */</span><br><span class="line">#define AID_DRM           1019  /* DRM server */</span><br><span class="line">#define AID_MDNSR         1020  /* MulticastDNSResponder (service discovery) */</span><br><span class="line">#define AID_GPS           1021  /* GPS daemon */</span><br><span class="line">#define AID_UNUSED1       1022  /* deprecated, DO NOT USE */</span><br><span class="line">#define AID_MEDIA_RW      1023  /* internal media storage write access */</span><br><span class="line">#define AID_MTP           1024  /* MTP USB driver access */</span><br><span class="line">#define AID_UNUSED2       1025  /* deprecated, DO NOT USE */</span><br><span class="line">#define AID_DRMRPC        1026  /* group for drm rpc */</span><br><span class="line">#define AID_NFC           1027  /* nfc subsystem */</span><br><span class="line">#define AID_SDCARD_R      1028  /* external storage read access */</span><br><span class="line">#define AID_CLAT          1029  /* clat part of nat464 */</span><br><span class="line">#define AID_LOOP_RADIO    1030  /* loop radio devices */</span><br><span class="line">#define AID_MEDIA_DRM     1031  /* MediaDrm plugins */</span><br><span class="line">#define AID_PACKAGE_INFO  1032  /* access to installed package details */</span><br><span class="line">#define AID_SDCARD_PICS   1033  /* external storage photos access */</span><br><span class="line">#define AID_SDCARD_AV     1034  /* external storage audio/video access */</span><br><span class="line">#define AID_SDCARD_ALL    1035  /* access all users external storage */</span><br><span class="line">#define AID_LOGD          1036  /* log daemon */</span><br><span class="line">#define AID_SHARED_RELRO  1037  /* creator of shared GNU RELRO files */</span><br><span class="line"></span><br><span class="line">#define AID_SHELL         2000  /* adb and debug shell user */</span><br><span class="line">#define AID_CACHE         2001  /* cache access */</span><br><span class="line">#define AID_DIAG          2002  /* access to diagnostic resources */</span><br><span class="line"></span><br><span class="line">/* The range 2900-2999 is reserved for OEM, and must never be</span><br><span class="line"> * used here */</span><br><span class="line">#define AID_OEM_RESERVED_START 2900</span><br><span class="line">#define AID_OEM_RESERVED_END   2999</span><br><span class="line"></span><br><span class="line">/* The 3000 series are intended for use as supplemental group id&apos;s only.</span><br><span class="line"> * They indicate special Android capabilities that the kernel is aware of. */</span><br><span class="line">#define AID_NET_BT_ADMIN  3001  /* bluetooth: create any socket */</span><br><span class="line">#define AID_NET_BT        3002  /* bluetooth: create sco, rfcomm or l2cap sockets */</span><br><span class="line">#define AID_INET          3003  /* can create AF_INET and AF_INET6 sockets */</span><br><span class="line">#define AID_NET_RAW       3004  /* can create raw INET sockets */</span><br><span class="line">#define AID_NET_ADMIN     3005  /* can configure interfaces and routing tables. */</span><br><span class="line">#define AID_NET_BW_STATS  3006  /* read bandwidth statistics */</span><br><span class="line">#define AID_NET_BW_ACCT   3007  /* change bandwidth statistics accounting */</span><br><span class="line">#define AID_NET_BT_STACK  3008  /* bluetooth: access config files */</span><br><span class="line"></span><br><span class="line">#define AID_EVERYBODY     9997  /* shared between all apps in the same profile */</span><br><span class="line">#define AID_MISC          9998  /* access to misc storage */</span><br><span class="line">#define AID_NOBODY        9999</span><br><span class="line"></span><br><span class="line">#define AID_APP          10000  /* first app user */</span><br><span class="line"></span><br><span class="line">#define AID_ISOLATED_START 99000 /* start of uids for fully isolated sandboxed processes */</span><br><span class="line">#define AID_ISOLATED_END   99999 /* end of uids for fully isolated sandboxed processes */</span><br><span class="line"></span><br><span class="line">#define AID_USER        100000  /* offset for uid ranges for each user */</span><br><span class="line"></span><br><span class="line">#define AID_SHARED_GID_START 50000 /* start of gids for apps in each user to share */</span><br><span class="line">#define AID_SHARED_GID_END   59999 /* start of gids for apps in each user to share */</span><br></pre></td></tr></table></figure>
+<p>ps 查看 com.daoxu.myapplication 的信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">USER      PID   PPID  VSIZE  RSS   WCHAN            PC  NAME</span><br><span class="line">u0_a62    6399  1362  1274908 36840 SyS_epoll_ b739f2b5 S com.daoxu.myapplication</span><br></pre></td></tr></table></figure>
+<p>/data/system/package.list 查看 com.daoxu.myapplication 进程信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com.daoxu.myapplication 10062 1 /data/data/com.daoxu.myapplication default none</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>系统服务的UID从1000开始。1000是system用户（AID_SYSTEM），具有特殊的权限。<br>  应用程序是从10000开始（AID_APP），在ps中查看用户到的USER信息为 u0_a62 （支持多用户的androifd版本是uY_aXXX的格式，如果不支持多用户的则是app_XXX），XXX表示从AID_APP开始的偏移量（myapplication的为 10062-10000=62），Y则是Android的user ID（主要这边跟uid是不同的，是不同用户的的编号），所以上面ps看到的信息是u0_a62。</p>
+</blockquote>
+<h1 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h1><p>#权限的本质<br>如前面所说的，Android应用程序是沙箱隔离的，默认只能访问程序自己创建的文件和非常有限的系统服务，为了与系统和其他应用交互，Android引入了权限机制。</p>
+<p>#权限查看</p>
+<p>可以使用pm list permissons查看当前系统已知的权限列表。通常权限名称以定义它的程序的包名作为前缀，再接上permission字符串。内置的权限都是在android包里面定义的（这个在pkms中用详细的介绍），所以一般都是 android.permission 作为前缀。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">1|root@generic_x86:/ # pm list permissions                                     </span><br><span class="line">All Permissions:</span><br><span class="line"></span><br><span class="line">permission:android.permission.REAL_GET_TASKS</span><br><span class="line">permission:android.permission.ACCESS_CACHE_FILESYSTEM</span><br><span class="line">permission:android.permission.REMOTE_AUDIO_PLAYBACK</span><br><span class="line">permission:com.google.android.apps.photos.permission.C2D_MESSAGE</span><br><span class="line">permission:android.permission.INTENT_FILTER_VERIFICATION_AGENT</span><br><span class="line">permission:android.permission.BIND_INCALL_SERVICE</span><br><span class="line">permission:com.google.android.gms.trustagent.framework.model.DATA_CHANGE_NOTIFICATION</span><br><span class="line">permission:android.permission.WRITE_SETTINGS</span><br><span class="line">permission:android.permission.CONTROL_KEYGUARD</span><br><span class="line">permission:com.google.android.calendar.permission.C2D_MESSAGE</span><br><span class="line">permission:android.permission.CONFIGURE_WIFI_DISPLAY</span><br><span class="line">permission:android.permission.ACCESS_WIMAX_STATE</span><br><span class="line">permission:android.permission.SET_INPUT_CALIBRATION</span><br><span class="line">permission:android.permission.RECOVERY</span><br><span class="line">permission:android.permission.TEMPORARY_ENABLE_ACCESSIBILITY</span><br></pre></td></tr></table></figure>
+<p>#权限申请<br>在应用程序的AndroidManifest.xml文件中添加 <uses-permission></uses-permission> 标签。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=&quot;android.permission.INTERNET&quot;&gt;&lt;/uses-permission&gt;</span><br></pre></td></tr></table></figure>
+<p>#权限管理<br>在每个应用程序安装时，系统使用 <strong>包管理器服务</strong> ，将权限赋予它们。包管理器维护一个已安装程序包的核心数据库，包括预安装（系统应用）和用户安装的程序包。其中包括如下信息：</p>
+<ul>
+<li>安装路径</li>
+<li>版本</li>
+<li>签名证书</li>
+<li>每个包的权限</li>
+<li>所有已定义权限的列表。<br>这个包数据库以xml的形式存放在/data/system/packages.xml中，文件会随着应用的安装、升级和卸载进行更新。下面我们跟踪一个包来查看下。</li>
+</ul>
+<p>首先我们在程序包里申请了如下三个权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=&quot;android.permission.INTERNET&quot;&gt;&lt;/uses-permission&gt;</span><br><span class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;&gt;&lt;/uses-permission&gt;</span><br><span class="line">&lt;uses-permission android:name=&quot;android.permission.READ_EXTERNAL_STORAGE&quot;&gt;&lt;/uses-permission&gt;</span><br></pre></td></tr></table></figure>
+<p>在 targetSdkVersion 27 查看文件信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;package name=&quot;com.daoxu.securityclientdemo&quot; codePath=&quot;/data/app/com.daoxu.securityclientdemo-1&quot; nativeLibraryPath=&quot;/data/app/com.daoxu.securityclientdemo-1/lib&quot; publicFlags=&quot;944291654&quot; privateFlags=&quot;0&quot; ft=&quot;16456479468&quot; it=&quot;1645642beba&quot; ut=&quot;16456479c3e&quot; version=&quot;1&quot; userId=&quot;10065&quot;&gt;</span><br><span class="line">    &lt;sigs count=&quot;1&quot;&gt;</span><br><span class="line">        &lt;cert index=&quot;0&quot; /&gt;</span><br><span class="line">    &lt;/sigs&gt;</span><br><span class="line">    &lt;perms&gt;</span><br><span class="line">        &lt;item name=&quot;android.permission.INTERNET&quot; granted=&quot;true&quot; flags=&quot;0&quot; /&gt;</span><br><span class="line">    &lt;/perms&gt;</span><br><span class="line">    &lt;proper-signing-keyset identifier=&quot;7&quot; /&gt;</span><br><span class="line">&lt;/package&gt;</span><br></pre></td></tr></table></figure>
+<p>在 targetSdkVersion 22 查看文件信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;package name=&quot;com.daoxu.securityclientdemo&quot; codePath=&quot;/data/app/com.daoxu.securityclientdemo-1&quot; nativeLibraryPath=&quot;/data/app/com.daoxu.securityclientdemo-1/lib&quot; publicFlags=&quot;944291654&quot; privateFlags=&quot;0&quot; ft=&quot;164564de598&quot; it=&quot;164564dec1b&quot; ut=&quot;164564dec1b&quot; version=&quot;1&quot; userId=&quot;10066&quot;&gt;</span><br><span class="line">    &lt;sigs count=&quot;1&quot;&gt;</span><br><span class="line">        &lt;cert index=&quot;0&quot; /&gt;</span><br><span class="line">    &lt;/sigs&gt;</span><br><span class="line">    &lt;perms&gt;</span><br><span class="line">        &lt;item name=&quot;android.permission.INTERNET&quot; granted=&quot;true&quot; flags=&quot;0&quot; /&gt;</span><br><span class="line">        &lt;item name=&quot;android.permission.READ_EXTERNAL_STORAGE&quot; granted=&quot;true&quot; flags=&quot;0&quot; /&gt;</span><br><span class="line">        &lt;item name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; granted=&quot;true&quot; flags=&quot;0&quot; /&gt;</span><br><span class="line">    &lt;/perms&gt;</span><br><span class="line">    &lt;proper-signing-keyset identifier=&quot;7&quot; /&gt;</span><br><span class="line">&lt;/package&gt;</span><br></pre></td></tr></table></figure>
+<p>从上面的例子我们可以看出在不同的targetSdkVersion版本，给的授权列表是不同的，之所以会这样是因为6.0以后的动态权限机制导致的，这就涉及到了下面我们要讲的权限的保护分级。</p>
+<p>#权限级别</p>
+<ul>
+<li><p>normal 级别：默认值，低风险权限，无需用户确认。</p>
+</li>
+<li><p>dangerous 级别：危险级别，需要用户确认才能授权。</p>
+</li>
+<li><p>signature 级别：只会赋予与申明权限的应用程序使用相同签名的应用权限。一般我们所说的系统权限（这边所谓的系统权限要和 sharedUserId 的system 区别开来不是一个概念）其实就是指的 system 应用所声明的权限，所以应用程序在使用这些权限的时候需要使用系统签名（不需要声明 sharedUserId 也是可以的）。</p>
+</li>
+<li><p>signatureOrSystem 级别：这个级别的权限可以授权与 “系统应用” 和 与声明权限具有相同签名的应用程序，所以这个算是一个折中的方案。需要注意的是 在4.3 以前 这个  “系统应用”  是泛指在system分区下的应用，而4.3以后是特指 /system/priv-app目录下的应用。</p>
+</li>
+</ul>
+<h1 id="权限的赋予"><a href="#权限的赋予" class="headerlink" title="权限的赋予"></a>权限的赋予</h1><p>权限的执行会在Android的各个层次上实施。</p>
+<ul>
+<li>高层的组件:应用和系统服务，通过包管理器查询应用程序被赋予的是哪些权限</li>
+<li>底层的组件：本地的守护进程。通常不通过包管理器，而是依赖进程的UID、GID和补充GID来决定赋予的权限。</li>
+<li>系统资源：设备文件、UNIX域套接字和网络套接字，通过内核根据所有者、目标资源的访问权限和访问进程的UID和GID来进行控制。</li>
+</ul>
+<p>#权限和进程属性</p>
+<p>每个应用程序在安装时都会被分配一个独一无二的UID，在一个专有的进程中执行（有待商榷，一个应用程序可以是多个进程）。应用启动的时候，进程的UID和GID由包管理器服务设置为应用程序的UID。如果应用已被赋予额外的权限，就把这些权限映射成一组GID,作为补充GID分配给进程。</p>
+<p>内置权限到GID的映射定义在 源码：frameworks\base\data\etc\platform.xml (机子：/system/etc/permissions/platform.xml）里。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">&lt;permission name=&quot;android.permission.NET_TUNNELING&quot; &gt;</span><br><span class="line">    &lt;group gid=&quot;vpn&quot; /&gt;</span><br><span class="line">&lt;/permission&gt;</span><br><span class="line"></span><br><span class="line">&lt;permission name=&quot;android.permission.INTERNET&quot; &gt;</span><br><span class="line">    &lt;group gid=&quot;inet&quot; /&gt;</span><br><span class="line">&lt;/permission&gt;</span><br><span class="line"></span><br><span class="line">&lt;permission name=&quot;android.permission.READ_LOGS&quot; &gt;</span><br><span class="line">    &lt;group gid=&quot;log&quot; /&gt;</span><br><span class="line">&lt;/permission&gt;</span><br><span class="line"></span><br><span class="line">&lt;permission name=&quot;android.permission.WRITE_MEDIA_STORAGE&quot; &gt;</span><br><span class="line">    &lt;group gid=&quot;media_rw&quot; /&gt;</span><br><span class="line">    &lt;group gid=&quot;sdcard_rw&quot; /&gt;</span><br><span class="line">&lt;/permission&gt;</span><br><span class="line"></span><br><span class="line">&lt;permission name=&quot;android.permission.ACCESS_MTP&quot; &gt;</span><br><span class="line">    &lt;group gid=&quot;mtp&quot; /&gt;</span><br><span class="line">&lt;/permission&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;!-- ================================================================== --&gt;</span><br><span class="line">&lt;!-- ================================================================== --&gt;</span><br><span class="line">&lt;!-- ================================================================== --&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- The following tags are assigning high-level permissions to specific</span><br><span class="line">     user IDs.  These are used to allow specific core system users to</span><br><span class="line">     perform the given operations with the higher-level framework.  For</span><br><span class="line">     example, we give a wide variety of permissions to the shell user</span><br><span class="line">     since that is the user the adb shell runs under and developers and</span><br><span class="line">     others should have a fairly open environment in which to</span><br><span class="line">     interact with the system. --&gt;</span><br><span class="line"></span><br><span class="line">&lt;assign-permission name=&quot;android.permission.MODIFY_AUDIO_SETTINGS&quot; uid=&quot;media&quot; /&gt;</span><br><span class="line">&lt;assign-permission name=&quot;android.permission.ACCESS_SURFACE_FLINGER&quot; uid=&quot;media&quot; /&gt;</span><br><span class="line">&lt;assign-permission name=&quot;android.permission.WAKE_LOCK&quot; uid=&quot;media&quot; /&gt;</span><br><span class="line">&lt;assign-permission name=&quot;android.permission.UPDATE_DEVICE_STATS&quot; uid=&quot;media&quot; /&gt;</span><br><span class="line">&lt;assign-permission name=&quot;android.permission.UPDATE_APP_OPS_STATS&quot; uid=&quot;media&quot; /&gt;</span><br><span class="line"></span><br><span class="line">&lt;assign-permission name=&quot;android.permission.ACCESS_SURFACE_FLINGER&quot; uid=&quot;graphics&quot; /&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- This is a list of all the libraries available for application</span><br><span class="line">     code to link against. --&gt;</span><br><span class="line"></span><br><span class="line">&lt;library name=&quot;android.test.runner&quot;</span><br><span class="line">        file=&quot;/system/framework/android.test.runner.jar&quot; /&gt;</span><br><span class="line">&lt;library name=&quot;javax.obex&quot;</span><br><span class="line">        file=&quot;/system/framework/javax.obex.jar&quot; /&gt;</span><br><span class="line">&lt;library name=&quot;org.apache.http.legacy&quot;</span><br><span class="line">        file=&quot;/system/framework/org.apache.http.legacy.jar&quot; /&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- These are the standard packages that are white-listed to always have internet</span><br><span class="line">     access while in power save mode, even if they aren&apos;t in the foreground. --&gt;</span><br><span class="line">&lt;allow-in-power-save-except-idle package=&quot;com.android.providers.downloads&quot; /&gt;</span><br></pre></td></tr></table></figure>
+<p>assign-permission 用于相反的目的。它用于给运行在指定的UID下，没有对应包文件的系统进程赋予更高层次的权限（比如给守护进程，一般是bin文件，是不能像应用程序那样申请权限，就可以在这边申请）。</p>
+<p>这边的 group gid 就定义在上面我们介绍的 \system\core\include\private\android_filesystem_config.h 文件中。</p>
+<p>包管理器在启动的时候会维护一个权限到GID的列表，当包管理器给一个包授权的时候，会检查权限是否有对应的GID。如果有则加入到补充GID列表中。这个补充GID列表会写在上面我们说的 /data/system/package.list 中，在最后一个字段就是这个列表。</p>
+<h1 id="使用命令"><a href="#使用命令" class="headerlink" title="使用命令"></a>使用命令</h1><p>查看服务列表:service list<br>查看权限列表:pm list permissions,-f的话可以显示更加显示的信息</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/日常问题列表/" rel="next" title="日常问题列表">
+                <i class="fa fa-chevron-left"></i> 日常问题列表
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="道墟" />
+            
+              <p class="site-author-name" itemprop="name">道墟</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">Artikel</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">Kategorien</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">Tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#进程隔离"><span class="nav-text">进程隔离</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#权限"><span class="nav-text">权限</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#权限的赋予"><span class="nav-text">权限的赋予</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用命令"><span class="nav-text">使用命令</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">道墟</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
