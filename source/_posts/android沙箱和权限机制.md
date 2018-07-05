@@ -3,11 +3,10 @@ author: 道墟
 date: 2018-07-01 18:24:52
 tags:
 ---
-
 # 进程隔离
 android中进程的地址空间是独立的，一个进程不能直接访问另一个进程的地址空间。
 
-#应用程序沙箱
+# 应用程序沙箱
 在每个应用程序的安装阶段，Android自动为每个应用赋予一个独一无二的UID，通常称作appid，应用执行时就在特定进程内以该UID运行。
 
 系统守护进程和应用程序都是在明确的、恒定的UID运行的，很少有守护进程以root用户（UID=0）运行。这些UID是静态定义在 \system\core\include\private\android_filesystem_config.h 文件中。
@@ -109,10 +108,10 @@ com.daoxu.myapplication 10062 1 /data/data/com.daoxu.myapplication default none
   应用程序是从10000开始（AID_APP），在ps中查看用户到的USER信息为 u0_a62 （支持多用户的androifd版本是uY_aXXX的格式，如果不支持多用户的则是app_XXX），XXX表示从AID_APP开始的偏移量（myapplication的为 10062-10000=62），Y则是Android的user ID（主要这边跟uid是不同的，是不同用户的的编号），所以上面ps看到的信息是u0_a62。
 
 # 权限
-#权限的本质
+# 权限的本质
 如前面所说的，Android应用程序是沙箱隔离的，默认只能访问程序自己创建的文件和非常有限的系统服务，为了与系统和其他应用交互，Android引入了权限机制。
 
-#权限查看
+# 权限查看
 
 可以使用pm list permissons查看当前系统已知的权限列表。通常权限名称以定义它的程序的包名作为前缀，再接上permission字符串。内置的权限都是在android包里面定义的（这个在pkms中用详细的介绍），所以一般都是 android.permission 作为前缀。
 
@@ -138,14 +137,14 @@ permission:android.permission.TEMPORARY_ENABLE_ACCESSIBILITY
 
 ```
 
-#权限申请
+# 权限申请
 在应用程序的AndroidManifest.xml文件中添加 <uses-permission></uses-permission> 标签。
 
 ```
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 ```
 
-#权限管理
+# 权限管理
 在每个应用程序安装时，系统使用 **包管理器服务** ，将权限赋予它们。包管理器维护一个已安装程序包的核心数据库，包括预安装（系统应用）和用户安装的程序包。其中包括如下信息：
 - 安装路径
 - 版本
@@ -195,7 +194,7 @@ permission:android.permission.TEMPORARY_ENABLE_ACCESSIBILITY
 
 从上面的例子我们可以看出在不同的targetSdkVersion版本，给的授权列表是不同的，之所以会这样是因为6.0以后的动态权限机制导致的，这就涉及到了下面我们要讲的权限的保护分级。
 
-#权限级别
+# 权限级别
 - normal 级别：默认值，低风险权限，无需用户确认。
 
 - dangerous 级别：危险级别，需要用户确认才能授权。
@@ -210,9 +209,9 @@ permission:android.permission.TEMPORARY_ENABLE_ACCESSIBILITY
 - 底层的组件：本地的守护进程。通常不通过包管理器，而是依赖进程的UID、GID和补充GID来决定赋予的权限。
 - 系统资源：设备文件、UNIX域套接字和网络套接字，通过内核根据所有者、目标资源的访问权限和访问进程的UID和GID来进行控制。
 
-#权限和进程属性
+# 权限和进程属性
 
-每个应用程序在安装时都会被分配一个独一无二的UID，在一个专有的进程中执行（有待商榷，一个应用程序可以是多个进程）。应用启动的时候，进程的UID和GID由包管理器服务设置为应用程序的UID。如果应用已被赋予额外的权限，就把这些权限映射成一组GID,作为补充GID分配给进程。
+每个应用程序在安装时都会被分配一个独一无二的UID，在一个专有的进程中执行（这边说法不严谨，一个应用程序可以是多个进程，即1个UID 可以对应多个PID，就像后面我们会说到的共享UID也是类似的情况）。应用启动的时候，进程的UID和GID由包管理器服务设置为应用程序的UID。如果应用已被赋予额外的权限，就把这些权限映射成一组GID,作为补充GID分配给进程。
 
 内置权限到GID的映射定义在 源码：frameworks\base\data\etc\platform.xml (机子：/system/etc/permissions/platform.xml）里。
 
