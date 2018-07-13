@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="修改窗口或者屏幕属性relayoutWindow 修改指定窗口的布局参数  参数列表分析   参数 释义     Session session 调用者所在进程的session示例   IWindow client 需要进行relayout的窗口   int seq 状态栏和导航栏可见性相关的 符号   WindowManager.LayoutParams attrs 窗口的新布局属性  根据at">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WMS">
+<meta property="og:url" content="http://yoursite.com/2018/07/13/WMS/index.html">
+<meta property="og:site_name" content="道墟">
+<meta property="og:description" content="修改窗口或者屏幕属性relayoutWindow 修改指定窗口的布局参数  参数列表分析   参数 释义     Session session 调用者所在进程的session示例   IWindow client 需要进行relayout的窗口   int seq 状态栏和导航栏可见性相关的 符号   WindowManager.LayoutParams attrs 窗口的新布局属性  根据at">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-07-13T03:04:40.017Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WMS">
+<meta name="twitter:description" content="修改窗口或者屏幕属性relayoutWindow 修改指定窗口的布局参数  参数列表分析   参数 释义     Session session 调用者所在进程的session示例   IWindow client 需要进行relayout的窗口   int seq 状态栏和导航栏可见性相关的 符号   WindowManager.LayoutParams attrs 窗口的新布局属性  根据at">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/13/WMS/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>WMS | 道墟</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">道墟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">初九，潜龙勿用</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Startseite</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archiv</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/13/WMS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="道墟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道墟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WMS
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+
+              
+                
+              
+
+              <time title="Post created: 2018-07-13 11:04:38 / Updated at: 11:04:40" itemprop="dateCreated datePublished" datetime="2018-07-13T11:04:38+08:00">2018-07-13</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="修改窗口或者屏幕属性"><a href="#修改窗口或者屏幕属性" class="headerlink" title="修改窗口或者屏幕属性"></a>修改窗口或者屏幕属性</h1><h2 id="relayoutWindow"><a href="#relayoutWindow" class="headerlink" title="relayoutWindow"></a>relayoutWindow</h2><blockquote>
+<p>修改指定窗口的布局参数</p>
+</blockquote>
+<h3 id="参数列表分析"><a href="#参数列表分析" class="headerlink" title="参数列表分析"></a>参数列表分析</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>释义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Session session</td>
+<td>调用者所在进程的session示例</td>
+</tr>
+<tr>
+<td>IWindow client</td>
+<td>需要进行relayout的窗口</td>
+</tr>
+<tr>
+<td>int seq</td>
+<td>状态栏和导航栏可见性相关的 符号</td>
+</tr>
+<tr>
+<td>WindowManager.LayoutParams attrs</td>
+<td>窗口的新布局属性  根据attrs 重新布局一个窗口</td>
+</tr>
+<tr>
+<td>int requestedWidth</td>
+<td>客户端需求的宽度</td>
+</tr>
+<tr>
+<td>int requestedHeight</td>
+<td>客户端需求的高度</td>
+</tr>
+<tr>
+<td>int viewVisibility</td>
+<td>窗口的可见性</td>
+</tr>
+<tr>
+<td>int flags</td>
+<td>定义一些布局行为</td>
+</tr>
+<tr>
+<td>Rect outFrame</td>
+<td>返回给调用者的实例，保存了窗口重新布局后的大小和位置</td>
+</tr>
+<tr>
+<td>Rect outOverscanInsets</td>
+<td>可以绘制内容的矩形边界</td>
+</tr>
+<tr>
+<td>Rect outContentInsets</td>
+<td>可视矩形边界到 mframe的像素差</td>
+</tr>
+<tr>
+<td>Rect outVisibleInsets</td>
+<td></td>
+</tr>
+<tr>
+<td>Rect outStableInsets</td>
+<td></td>
+</tr>
+<tr>
+<td>Rect outOutsets</td>
+<td></td>
+</tr>
+<tr>
+<td>Configuration outConfig</td>
+<td>重新布局后，wms为窗口计算出来的Configuration</td>
+</tr>
+<tr>
+<td>Surface outSurface</td>
+<td>用来接收分配的 Surface</td>
+</tr>
+</tbody>
+</table>
+<h3 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h3><h4 id="权限相关检查"><a href="#权限相关检查" class="headerlink" title="权限相关检查"></a>权限相关检查</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">////Log.i(TAG, "relayoutWindow");</span></span><br><span class="line"><span class="keyword">boolean</span> toBeDisplayed = <span class="keyword">false</span>;</span><br><span class="line"><span class="keyword">boolean</span> inTouchMode;</span><br><span class="line"><span class="keyword">boolean</span> configChanged;</span><br><span class="line"><span class="keyword">boolean</span> surfaceChanged = <span class="keyword">false</span>;</span><br><span class="line"><span class="keyword">boolean</span> animating;</span><br><span class="line"></span><br><span class="line"><span class="comment">//权限检查</span></span><br><span class="line"><span class="keyword">boolean</span> hasStatusBarPermission =</span><br><span class="line">        mContext.checkCallingOrSelfPermission(android.Manifest.permission.STATUS_BAR)</span><br><span class="line">                == PackageManager.PERMISSION_GRANTED;</span><br><span class="line"></span><br><span class="line"><span class="keyword">long</span> origId = Binder.clearCallingIdentity();</span><br></pre></td></tr></table></figure>
+<h4 id="根据用户传入的参数更新windowState相关属性"><a href="#根据用户传入的参数更新windowState相关属性" class="headerlink" title="根据用户传入的参数更新windowState相关属性"></a>根据用户传入的参数更新windowState相关属性</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//下面操作（一直到方法结束）是在锁住mWindowMap情况下完成的。在wms中，几乎所有的操作都是在锁住mWindowMap下完成的。</span></span><br><span class="line"><span class="keyword">synchronized</span>(mWindowMap) &#123;</span><br><span class="line">    <span class="comment">//获取需要更新的 WindowState</span></span><br><span class="line">    WindowState win = windowForClientLocked(session, client, <span class="keyword">false</span>);</span><br><span class="line">    <span class="keyword">if</span> (win == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    WindowStateAnimator winAnimator = win.mWinAnimator;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//更新win的宽度和高度为客户端请求的大小</span></span><br><span class="line">    <span class="keyword">if</span> (viewVisibility != View.GONE &amp;&amp; (win.mRequestedWidth != requestedWidth</span><br><span class="line">            || win.mRequestedHeight != requestedHeight)) &#123;</span><br><span class="line">        win.mLayoutNeeded = <span class="keyword">true</span>;</span><br><span class="line">        win.mRequestedWidth = requestedWidth;</span><br><span class="line">        win.mRequestedHeight = requestedHeight;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (attrs != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// attrs.type：TYPE_SYSTEM_OVERLAY 和 TYPE_SECURE_SYSTEM_OVERLAY 类型，attrs.flags 设置为不接受输入事件</span></span><br><span class="line">        <span class="comment">// attrs.type：TYPE_STATUS_BAR，mKeyguardHidden 为true 则设置 attrs.flags 清除 FLAG_SHOW_WALLPAPER</span></span><br><span class="line">        mPolicy.adjustWindowParamsLw(attrs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//检查权限，并设置 标示位 mSystemUiVisibility</span></span><br><span class="line">    <span class="comment">// if they don't have the permission, mask out the status bar bits</span></span><br><span class="line">    <span class="keyword">int</span> systemUiVisibility = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (attrs != <span class="keyword">null</span>) &#123;</span><br><span class="line">        systemUiVisibility = (attrs.systemUiVisibility|attrs.subtreeSystemUiVisibility);</span><br><span class="line">        <span class="keyword">if</span> ((systemUiVisibility &amp; StatusBarManager.DISABLE_MASK) != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!hasStatusBarPermission) &#123;</span><br><span class="line">                systemUiVisibility &amp;= ~StatusBarManager.DISABLE_MASK;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (attrs != <span class="keyword">null</span> &amp;&amp; seq == win.mSeq) &#123;</span><br><span class="line">        win.mSystemUiVisibility = systemUiVisibility;</span><br><span class="line">    &#125;</span><br><span class="line">        </span><br><span class="line">    <span class="comment">//判断是否需要延迟销毁</span></span><br><span class="line">    winAnimator.mSurfaceDestroyDeferred =</span><br><span class="line">            (flags&amp;WindowManagerGlobal.RELAYOUT_DEFER_SURFACE_DESTROY) != <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> attrChanges = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> flagChanges = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (attrs != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (win.mAttrs.type != attrs.type) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">                    <span class="string">"Window type can not be changed after the window is added."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        flagChanges = win.mAttrs.flags ^= attrs.flags;</span><br><span class="line">        attrChanges = win.mAttrs.copyFrom(attrs);</span><br><span class="line">        <span class="keyword">if</span> ((attrChanges &amp; (WindowManager.LayoutParams.LAYOUT_CHANGED</span><br><span class="line">                | WindowManager.LayoutParams.SYSTEM_UI_VISIBILITY_CHANGED)) != <span class="number">0</span>) &#123;</span><br><span class="line">            win.mLayoutNeeded = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.v(TAG, <span class="string">"Relayout "</span> + win + <span class="string">": viewVisibility="</span> + viewVisibility</span><br><span class="line">            + <span class="string">" req="</span> + requestedWidth + <span class="string">"x"</span> + requestedHeight + <span class="string">" "</span> + win.mAttrs);</span><br><span class="line"></span><br><span class="line">    win.mEnforceSizeCompat =</span><br><span class="line">            (win.mAttrs.privateFlags &amp; PRIVATE_FLAG_COMPATIBLE_WINDOW) != <span class="number">0</span>;</span><br><span class="line">    <span class="comment">//更新透明度信息</span></span><br><span class="line">    <span class="keyword">if</span> ((attrChanges &amp; WindowManager.LayoutParams.ALPHA_CHANGED) != <span class="number">0</span>) &#123;</span><br><span class="line">        winAnimator.mAlpha = attrs.alpha;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> scaledWindow =</span><br><span class="line">        ((win.mAttrs.flags &amp; WindowManager.LayoutParams.FLAG_SCALED) != <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (scaledWindow) &#123;</span><br><span class="line">        <span class="comment">// requested&#123;Width|Height&#125; Surface's physical size</span></span><br><span class="line">        <span class="comment">// attrs.&#123;width|height&#125; Size on screen</span></span><br><span class="line">        win.mHScale = (attrs.width  != requestedWidth)  ?</span><br><span class="line">                (attrs.width  / (<span class="keyword">float</span>)requestedWidth) : <span class="number">1.0f</span>;</span><br><span class="line">        win.mVScale = (attrs.height != requestedHeight) ?</span><br><span class="line">                (attrs.height / (<span class="keyword">float</span>)requestedHeight) : <span class="number">1.0f</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        win.mHScale = win.mVScale = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">boolean</span> imMayMove = (flagChanges &amp; (FLAG_ALT_FOCUSABLE_IM | FLAG_NOT_FOCUSABLE)) != <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> isDefaultDisplay = win.isDefaultDisplay();</span><br><span class="line">    <span class="keyword">boolean</span> focusMayChange = isDefaultDisplay &amp;&amp; (win.mViewVisibility != viewVisibility</span><br><span class="line">            || ((flagChanges &amp; FLAG_NOT_FOCUSABLE) != <span class="number">0</span>)</span><br><span class="line">            || (!win.mRelayoutCalled));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">boolean</span> wallpaperMayMove = win.mViewVisibility != viewVisibility</span><br><span class="line">            &amp;&amp; (win.mAttrs.flags &amp; FLAG_SHOW_WALLPAPER) != <span class="number">0</span>;</span><br><span class="line">    wallpaperMayMove |= (flagChanges &amp; FLAG_SHOW_WALLPAPER) != <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ((flagChanges &amp; FLAG_SECURE) != <span class="number">0</span> &amp;&amp; winAnimator.mSurfaceControl != <span class="keyword">null</span>) &#123;</span><br><span class="line">        winAnimator.mSurfaceControl.setSecure(isSecureLocked(win));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    win.mRelayoutCalled = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> oldVisibility = win.mViewVisibility;</span><br><span class="line">    win.mViewVisibility = viewVisibility;</span><br><span class="line">    <span class="keyword">if</span> (DEBUG_SCREEN_ON) &#123;</span><br><span class="line">        RuntimeException stack = <span class="keyword">new</span> RuntimeException();</span><br><span class="line">        stack.fillInStackTrace();</span><br><span class="line">        Slog.i(TAG, <span class="string">"Relayout "</span> + win + <span class="string">": oldVis="</span> + oldVisibility</span><br><span class="line">                + <span class="string">" newVis="</span> + viewVisibility, stack);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="根据window可见性更新或创建Surface及启动动画效果-todo-后续动画系统再研究这边"><a href="#根据window可见性更新或创建Surface及启动动画效果-todo-后续动画系统再研究这边" class="headerlink" title="根据window可见性更新或创建Surface及启动动画效果(todo 后续动画系统再研究这边)"></a>根据window可见性更新或创建Surface及启动动画效果(todo 后续动画系统再研究这边)</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">if</span> (viewVisibility == View.VISIBLE &amp;&amp;</span><br><span class="line">        (win.mAppToken == <span class="keyword">null</span> || !win.mAppToken.clientHidden)) &#123;</span><br><span class="line"></span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    toBeDisplayed = !win.isVisibleLw();</span><br><span class="line">    <span class="keyword">if</span> (win.mExiting) &#123;</span><br><span class="line">        winAnimator.cancelExitAnimationForNextAnimationLocked();</span><br><span class="line">        win.mExiting = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (win.mDestroying) &#123;</span><br><span class="line">        win.mDestroying = <span class="keyword">false</span>;</span><br><span class="line">        mDestroySurface.remove(win);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (oldVisibility == View.GONE) &#123;</span><br><span class="line">        winAnimator.mEnterAnimationPending = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    winAnimator.mEnteringAnimation = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">if</span> (toBeDisplayed) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((win.mAttrs.softInputMode &amp; SOFT_INPUT_MASK_ADJUST)</span><br><span class="line">                == SOFT_INPUT_ADJUST_RESIZE) &#123;</span><br><span class="line">            win.mLayoutNeeded = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (win.isDrawnLw() &amp;&amp; okToDisplay()) &#123;</span><br><span class="line">            winAnimator.applyEnterAnimationLocked();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> ((win.mAttrs.flags</span><br><span class="line">                &amp; WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON) != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (DEBUG_VISIBILITY) Slog.v(TAG,</span><br><span class="line">                    <span class="string">"Relayout window turning screen on: "</span> + win);</span><br><span class="line">            win.mTurnOnScreen = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (win.isConfigChanged()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (DEBUG_CONFIGURATION) Slog.i(TAG, <span class="string">"Window "</span> + win</span><br><span class="line">                    + <span class="string">" visible with new config: "</span> + mCurConfiguration);</span><br><span class="line">            outConfig.setTo(mCurConfiguration);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ((attrChanges&amp;WindowManager.LayoutParams.FORMAT_CHANGED) != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// If the format can be changed in place yaay!</span></span><br><span class="line">        <span class="comment">// If not, fall back to a surface re-build</span></span><br><span class="line">        <span class="keyword">if</span> (!winAnimator.tryChangeFormatInPlaceLocked()) &#123;</span><br><span class="line">            winAnimator.destroySurfaceLocked();</span><br><span class="line">            toBeDisplayed = <span class="keyword">true</span>;</span><br><span class="line">            surfaceChanged = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!win.mHasSurface) &#123;</span><br><span class="line">            surfaceChanged = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        SurfaceControl surfaceControl = winAnimator.createSurfaceLocked();</span><br><span class="line">        <span class="keyword">if</span> (surfaceControl != <span class="keyword">null</span>) &#123;</span><br><span class="line">            outSurface.copyFrom(surfaceControl);</span><br><span class="line">            <span class="keyword">if</span> (SHOW_TRANSACTIONS) Slog.i(TAG,</span><br><span class="line">                    <span class="string">"  OUT SURFACE "</span> + outSurface + <span class="string">": copied"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// For some reason there isn't a surface.  Clear the</span></span><br><span class="line">            <span class="comment">// caller's object so they see the same state.</span></span><br><span class="line">            outSurface.release();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        mInputMonitor.updateInputWindowsLw(<span class="keyword">true</span> <span class="comment">/*force*/</span>);</span><br><span class="line"></span><br><span class="line">        Slog.w(TAG, <span class="string">"Exception thrown when creating surface for client "</span></span><br><span class="line">                 + client + <span class="string">" ("</span> + win.mAttrs.getTitle() + <span class="string">")"</span>,</span><br><span class="line">                 e);</span><br><span class="line">        Binder.restoreCallingIdentity(origId);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (toBeDisplayed) &#123;</span><br><span class="line">        focusMayChange = isDefaultDisplay;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (win.mAttrs.type == TYPE_INPUT_METHOD</span><br><span class="line">            &amp;&amp; mInputMethodWindow == <span class="keyword">null</span>) &#123;</span><br><span class="line">        mInputMethodWindow = win;</span><br><span class="line">        imMayMove = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (win.mAttrs.type == TYPE_BASE_APPLICATION</span><br><span class="line">            &amp;&amp; win.mAppToken != <span class="keyword">null</span></span><br><span class="line">            &amp;&amp; win.mAppToken.startingWindow != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// Special handling of starting window over the base</span></span><br><span class="line">        <span class="comment">// window of the app: propagate lock screen flags to it,</span></span><br><span class="line">        <span class="comment">// to provide the correct semantics while starting.</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> mask =</span><br><span class="line">            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED</span><br><span class="line">            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD</span><br><span class="line">            | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON;</span><br><span class="line">        WindowManager.LayoutParams sa = win.mAppToken.startingWindow.mAttrs;</span><br><span class="line">        sa.flags = (sa.flags&amp;~mask) | (win.mAttrs.flags&amp;mask);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    winAnimator.mEnterAnimationPending = <span class="keyword">false</span>;</span><br><span class="line">    winAnimator.mEnteringAnimation = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (winAnimator.mSurfaceControl != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (DEBUG_VISIBILITY) Slog.i(TAG, <span class="string">"Relayout invis "</span> + win</span><br><span class="line">                + <span class="string">": mExiting="</span> + win.mExiting);</span><br><span class="line">        <span class="comment">// If we are not currently running the exit animation, we</span></span><br><span class="line">        <span class="comment">// need to see about starting one.</span></span><br><span class="line">        <span class="keyword">if</span> (!win.mExiting) &#123;</span><br><span class="line">            surfaceChanged = <span class="keyword">true</span>;</span><br><span class="line">            <span class="comment">// Try starting an animation; if there isn't one, we</span></span><br><span class="line">            <span class="comment">// can destroy the surface right away.</span></span><br><span class="line">            <span class="keyword">int</span> transit = WindowManagerPolicy.TRANSIT_EXIT;</span><br><span class="line">            <span class="keyword">if</span> (win.mAttrs.type == TYPE_APPLICATION_STARTING) &#123;</span><br><span class="line">                transit = WindowManagerPolicy.TRANSIT_PREVIEW_DONE;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (win.isWinVisibleLw() &amp;&amp;</span><br><span class="line">                    winAnimator.applyAnimationLocked(transit, <span class="keyword">false</span>)) &#123;</span><br><span class="line">                focusMayChange = isDefaultDisplay;</span><br><span class="line">                win.mExiting = <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (win.mWinAnimator.isAnimating()) &#123;</span><br><span class="line">                <span class="comment">// Currently in a hide animation... turn this into</span></span><br><span class="line">                <span class="comment">// an exit.</span></span><br><span class="line">                win.mExiting = <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (win == mWallpaperTarget) &#123;</span><br><span class="line">                <span class="comment">// If the wallpaper is currently behind this</span></span><br><span class="line">                <span class="comment">// window, we need to change both of them inside</span></span><br><span class="line">                <span class="comment">// of a transaction to avoid artifacts.</span></span><br><span class="line">                win.mExiting = <span class="keyword">true</span>;</span><br><span class="line">                win.mWinAnimator.mAnimating = <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (mInputMethodWindow == win) &#123;</span><br><span class="line">                    mInputMethodWindow = <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                winAnimator.destroySurfaceLocked();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//TODO (multidisplay): Magnification is supported only for the default</span></span><br><span class="line">            <span class="keyword">if</span> (mAccessibilityController != <span class="keyword">null</span></span><br><span class="line">                    &amp;&amp; win.getDisplayId() == Display.DEFAULT_DISPLAY) &#123;</span><br><span class="line">                mAccessibilityController.onWindowTransitionLocked(win, transit);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    outSurface.release();</span><br><span class="line">    <span class="keyword">if</span> (DEBUG_VISIBILITY) Slog.i(TAG, <span class="string">"Releasing surface in: "</span> + win);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="更新窗口焦点、壁纸可见性以及屏幕旋转"><a href="#更新窗口焦点、壁纸可见性以及屏幕旋转" class="headerlink" title="更新窗口焦点、壁纸可见性以及屏幕旋转"></a>更新窗口焦点、壁纸可见性以及屏幕旋转</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (focusMayChange) &#123;</span><br><span class="line">    <span class="comment">//System.out.println("Focus may change: " + win.mAttrs.getTitle());</span></span><br><span class="line">    <span class="keyword">if</span> (updateFocusedWindowLocked(UPDATE_FOCUS_WILL_PLACE_SURFACES,</span><br><span class="line">            <span class="keyword">false</span> <span class="comment">/*updateInputWindows*/</span>)) &#123;</span><br><span class="line">        imMayMove = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//System.out.println("Relayout " + win + ": focus=" + mCurrentFocus);</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//对输入法进行更新</span></span><br><span class="line"><span class="comment">// updateFocusedWindowLocked() already assigned layers so we only need to</span></span><br><span class="line"><span class="comment">// reassign them at this point if the IM window state gets shuffled</span></span><br><span class="line"><span class="keyword">if</span> (imMayMove &amp;&amp; (moveInputMethodWindowsIfNeededLocked(<span class="keyword">false</span>) || toBeDisplayed)) &#123;</span><br><span class="line">    <span class="comment">// Little hack here -- we -should- be able to rely on the</span></span><br><span class="line">    <span class="comment">// function to return true if the IME has moved and needs</span></span><br><span class="line">    <span class="comment">// its layer recomputed.  However, if the IME was hidden</span></span><br><span class="line">    <span class="comment">// and isn't actually moved in the list, its layer may be</span></span><br><span class="line">    <span class="comment">// out of data so we make sure to recompute it.</span></span><br><span class="line">    assignLayersLocked(win.getWindowList());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//wallpaperMayMove 表示窗口以 wallpaper作为背景 典型的例子 launcher和home</span></span><br><span class="line"><span class="keyword">if</span> (wallpaperMayMove) &#123;</span><br><span class="line">    getDefaultDisplayContentLocked().pendingLayoutChanges |=</span><br><span class="line">            WindowManagerPolicy.FINISH_LAYOUT_REDO_WALLPAPER;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//将窗口所在的 DisplayContent 标记为需要重新布局</span></span><br><span class="line"><span class="keyword">final</span> DisplayContent displayContent = win.getDisplayContent();</span><br><span class="line"><span class="keyword">if</span> (displayContent != <span class="keyword">null</span>) &#123;</span><br><span class="line">    displayContent.layoutNeeded = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line">win.mGivenInsetsPending = (flags&amp;WindowManagerGlobal.RELAYOUT_INSETS_PENDING) != <span class="number">0</span>;</span><br><span class="line">configChanged = updateOrientationFromAppTokensLocked(<span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="遍历所有的-DisplayContent-的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface"><a href="#遍历所有的-DisplayContent-的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface" class="headerlink" title="遍历所有的 DisplayContent 的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface"></a>遍历所有的 DisplayContent 的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">performLayoutAndPlaceSurfacesLocked();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (toBeDisplayed &amp;&amp; win.mIsWallpaper) &#123;</span><br><span class="line">    DisplayInfo displayInfo = getDefaultDisplayInfoLocked();</span><br><span class="line">    updateWallpaperOffsetLocked(win,</span><br><span class="line">            displayInfo.logicalWidth, displayInfo.logicalHeight, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (win.mAppToken != <span class="keyword">null</span>) &#123;</span><br><span class="line">    win.mAppToken.updateReportedVisibilityLocked();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="返回布局结果"><a href="#返回布局结果" class="headerlink" title="返回布局结果"></a>返回布局结果</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">    outFrame.set(win.mCompatFrame);</span><br><span class="line">    outOverscanInsets.set(win.mOverscanInsets);</span><br><span class="line">    outContentInsets.set(win.mContentInsets);</span><br><span class="line">    outVisibleInsets.set(win.mVisibleInsets);</span><br><span class="line">    outStableInsets.set(win.mStableInsets);</span><br><span class="line">    outOutsets.set(win.mOutsets);</span><br><span class="line">    <span class="keyword">if</span> (localLOGV) Slog.v(</span><br><span class="line">        TAG, <span class="string">"Relayout given client "</span> + client.asBinder()</span><br><span class="line">        + <span class="string">", requestedWidth="</span> + requestedWidth</span><br><span class="line">        + <span class="string">", requestedHeight="</span> + requestedHeight</span><br><span class="line">        + <span class="string">", viewVisibility="</span> + viewVisibility</span><br><span class="line">        + <span class="string">"\nRelayout returning frame="</span> + outFrame</span><br><span class="line">        + <span class="string">", surface="</span> + outSurface);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (localLOGV || DEBUG_FOCUS) Slog.v(</span><br><span class="line">        TAG, <span class="string">"Relayout of "</span> + win + <span class="string">": focusMayChange="</span> + focusMayChange);</span><br><span class="line"></span><br><span class="line">    inTouchMode = mInTouchMode;</span><br><span class="line"></span><br><span class="line">    mInputMonitor.updateInputWindowsLw(<span class="keyword">true</span> <span class="comment">/*force*/</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (DEBUG_LAYOUT) &#123;</span><br><span class="line">        Slog.v(TAG, <span class="string">"Relayout complete "</span> + win + <span class="string">": outFrame="</span> + outFrame.toShortString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="向ams更新Configuration-因为屏幕可能旋转"><a href="#向ams更新Configuration-因为屏幕可能旋转" class="headerlink" title="向ams更新Configuration 因为屏幕可能旋转"></a>向ams更新Configuration 因为屏幕可能旋转</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (configChanged) &#123;</span><br><span class="line">    sendNewConfiguration();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="布局子系统"><a href="#布局子系统" class="headerlink" title="布局子系统"></a>布局子系统</h1><h2 id="performLayoutAndPlaceSurfacesLocked"><a href="#performLayoutAndPlaceSurfacesLocked" class="headerlink" title="performLayoutAndPlaceSurfacesLocked"></a>performLayoutAndPlaceSurfacesLocked</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">performLayoutAndPlaceSurfacesLocked</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> loopCount = <span class="number">6</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        mTraversalScheduled = <span class="keyword">false</span>;</span><br><span class="line">        performLayoutAndPlaceSurfacesLockedLoop();</span><br><span class="line">        mH.removeMessages(H.DO_TRAVERSAL);</span><br><span class="line">        loopCount--;</span><br><span class="line">    &#125; <span class="keyword">while</span> (mTraversalScheduled &amp;&amp; loopCount &gt; <span class="number">0</span>);</span><br><span class="line">    mInnerFields.mWallpaperActionPending = <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>performLayoutAndPlaceSurfacesLocked方法代码很短只有几行，但是在这之前我们需要搞清楚代码里面这个循环条件的含义，首先我们来关注下 <strong>mTraversalScheduled</strong> 变量，看看这个变量是做什么的：</p>
+<blockquote>
+<p>mTraversalScheduled 在循环开始的会将值置成false，当值为true的时候才能继续循环，所以在 performLayoutAndPlaceSurfacesLockedLoop 肯定对值进行了重新赋值，下面我们跟着 performLayoutAndPlaceSurfacesLockedLoop来继续跟踪。</p>
+</blockquote>
+<h2 id="performLayoutAndPlaceSurfacesLockedLoop"><a href="#performLayoutAndPlaceSurfacesLockedLoop" class="headerlink" title="performLayoutAndPlaceSurfacesLockedLoop"></a>performLayoutAndPlaceSurfacesLockedLoop</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">performLayoutAndPlaceSurfacesLockedLoop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mInLayout) &#123;</span><br><span class="line">            <span class="keyword">if</span> (DEBUG) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Recursive call!"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            Slog.w(TAG, <span class="string">"performLayoutAndPlaceSurfacesLocked called while in layout. Callers="</span></span><br><span class="line">                    + Debug.getCallers(<span class="number">3</span>));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mWaitingForConfig) &#123;</span><br><span class="line">            <span class="comment">// Our configuration has changed (most likely rotation), but we</span></span><br><span class="line">            <span class="comment">// don't yet have the complete configuration to report to</span></span><br><span class="line">            <span class="comment">// applications.  Don't do any window layout until we have it.</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!mDisplayReady) &#123;</span><br><span class="line">            <span class="comment">// Not yet initialized, nothing to do.</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Trace.traceBegin(Trace.TRACE_TAG_WINDOW_MANAGER, <span class="string">"wmLayout"</span>);</span><br><span class="line">        mInLayout = <span class="keyword">true</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//清理僵尸窗口</span></span><br><span class="line">        <span class="keyword">boolean</span> recoveringMemory = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (!mForceRemoves.isEmpty()) &#123;</span><br><span class="line">            recoveringMemory = <span class="keyword">true</span>;</span><br><span class="line">            <span class="comment">// Wait a little bit for things to settle down, and off we go.</span></span><br><span class="line">            <span class="keyword">while</span> (!mForceRemoves.isEmpty()) &#123;</span><br><span class="line">                WindowState ws = mForceRemoves.remove(<span class="number">0</span>);</span><br><span class="line">                Slog.i(TAG, <span class="string">"Force removing: "</span> + ws);</span><br><span class="line">                removeWindowInnerLocked(ws);</span><br><span class="line">            &#125;</span><br><span class="line">            Slog.w(TAG, <span class="string">"Due to memory failure, waiting a bit for next layout"</span>);</span><br><span class="line">            Object tmp = <span class="keyword">new</span> Object();</span><br><span class="line">            <span class="keyword">synchronized</span> (tmp) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    tmp.wait(<span class="number">250</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//主要的布局逻辑 下面会对这个方法进行追踪</span></span><br><span class="line">            performLayoutAndPlaceSurfacesLockedInner(recoveringMemory);</span><br><span class="line"></span><br><span class="line">            mInLayout = <span class="keyword">false</span>;</span><br><span class="line">            <span class="comment">//needsLayout 前面 relayoutWindow 方法中 对 DispplayContent的mLayoutNeeded字段赋值</span></span><br><span class="line">            <span class="keyword">if</span> (needsLayout()) &#123;</span><br><span class="line">                <span class="comment">//这边对 mTraversalScheduled 进行了赋值为true，同时也对次数进行了控制</span></span><br><span class="line">                <span class="keyword">if</span> (++mLayoutRepeatCount &lt; <span class="number">6</span>) &#123;</span><br><span class="line">                    requestTraversalLocked();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    Slog.e(TAG, <span class="string">"Performed 6 layouts in a row. Skipping"</span>);</span><br><span class="line">                    mLayoutRepeatCount = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                mLayoutRepeatCount = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//通知监听者，窗口布局发生了变化</span></span><br><span class="line">            <span class="keyword">if</span> (mWindowsChanged &amp;&amp; !mWindowChangeListeners.isEmpty()) &#123;</span><br><span class="line">                mH.removeMessages(H.REPORT_WINDOWS_CHANGE);</span><br><span class="line">                mH.sendEmptyMessage(H.REPORT_WINDOWS_CHANGE);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">            mInLayout = <span class="keyword">false</span>;</span><br><span class="line">            Slog.wtf(TAG, <span class="string">"Unhandled exception while laying out windows"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Trace.traceEnd(Trace.TRACE_TAG_WINDOW_MANAGER);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="performLayoutAndPlaceSurfacesLockedInner"><a href="#performLayoutAndPlaceSurfacesLockedInner" class="headerlink" title="performLayoutAndPlaceSurfacesLockedInner"></a>performLayoutAndPlaceSurfacesLockedInner</h2><h3 id="主要逻辑"><a href="#主要逻辑" class="headerlink" title="主要逻辑"></a>主要逻辑</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">布局前的预处理</span><br><span class="line">遍历所有 DisplayContent &#123;</span><br><span class="line">    遍历 DisplaContent 下所有的窗口&#123;</span><br><span class="line">        对窗口进行布局</span><br><span class="line">    &#125;</span><br><span class="line">    对布局结果进行检查，是否有必要重新对 DisplayContent 执行布局；</span><br><span class="line">    对 DisplayContent 的布局后处理；</span><br><span class="line">&#125;</span><br><span class="line">完成布局后的策略处理；</span><br></pre></td></tr></table></figure>
+<h3 id="布局前的处理"><a href="#布局前的处理" class="headerlink" title="布局前的处理"></a>布局前的处理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// "Something has changed!  Let's make it correct now."</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">performLayoutAndPlaceSurfacesLockedInner</span><span class="params">(<span class="keyword">boolean</span> recoveringMemory)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (DEBUG_WINDOW_TRACE) &#123;</span><br><span class="line">        Slog.v(TAG, <span class="string">"performLayoutAndPlaceSurfacesLockedInner: entry. Called by "</span></span><br><span class="line">                + Debug.getCallers(<span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//更新处于焦点状态的窗口</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">boolean</span> updateInputWindowsNeeded = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mFocusMayChange) &#123;</span><br><span class="line">        mFocusMayChange = <span class="keyword">false</span>;</span><br><span class="line">        updateInputWindowsNeeded = updateFocusedWindowLocked(UPDATE_FOCUS_WILL_PLACE_SURFACES,</span><br><span class="line">                <span class="keyword">false</span> <span class="comment">/*updateInputWindows*/</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将所有处于退出状态的tokens标记为不可见</span></span><br><span class="line">    <span class="comment">// Initialize state of exiting tokens.</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> numDisplays = mDisplayContents.size();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> displayNdx = <span class="number">0</span>; displayNdx &lt; numDisplays; ++displayNdx) &#123;</span><br><span class="line">        <span class="keyword">final</span> DisplayContent displayContent = mDisplayContents.valueAt(displayNdx);</span><br><span class="line">        <span class="keyword">for</span> (i=displayContent.mExitingTokens.size()-<span class="number">1</span>; i&gt;=<span class="number">0</span>; i--) &#123;</span><br><span class="line">            displayContent.mExitingTokens.get(i).hasVisible = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> stackNdx = mStackIdToStack.size() - <span class="number">1</span>; stackNdx &gt;= <span class="number">0</span>; --stackNdx) &#123;</span><br><span class="line">        <span class="comment">// Initialize state of exiting applications.</span></span><br><span class="line">        <span class="keyword">final</span> AppTokenList exitingAppTokens =</span><br><span class="line">                mStackIdToStack.valueAt(stackNdx).mExitingAppTokens;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> tokenNdx = exitingAppTokens.size() - <span class="number">1</span>; tokenNdx &gt;= <span class="number">0</span>; --tokenNdx) &#123;</span><br><span class="line">            exitingAppTokens.get(tokenNdx).hasVisible = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化 mInnerFields 中的状态变量 这些在后面的布局后处理中会使用到</span></span><br><span class="line">    mInnerFields.mHoldScreen = <span class="keyword">null</span>;</span><br><span class="line">    mInnerFields.mScreenBrightness = -<span class="number">1</span>;</span><br><span class="line">    mInnerFields.mButtonBrightness = -<span class="number">1</span>;</span><br><span class="line">    mInnerFields.mUserActivityTimeout = -<span class="number">1</span>;</span><br><span class="line">    mInnerFields.mObscureApplicationContentOnSecondaryDisplays = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//递增布局序号，wns每进行一次布局都会导致序号递增 AppWindowToken 中也保存了一个相应的布局序号，在布局过程中，wms通过对比这两个序号的值以确定 AppWindowToken 的布局状态是否最新。</span></span><br><span class="line">    mTransactionSequence++;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取手机屏幕的宽高尺寸，这个尺寸将用来布局水印和StrictMode的红色警告框</span></span><br><span class="line">    <span class="keyword">final</span> DisplayContent defaultDisplay = getDefaultDisplayContentLocked();</span><br><span class="line">    <span class="keyword">final</span> DisplayInfo defaultInfo = defaultDisplay.getDisplayInfo();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> defaultDw = defaultInfo.logicalWidth;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> defaultDh = defaultInfo.logicalHeight;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (SHOW_LIGHT_TRANSACTIONS) Slog.i(TAG,</span><br><span class="line">            <span class="string">"&gt;&gt;&gt; OPEN TRANSACTION performLayoutAndPlaceSurfaces"</span>);</span><br><span class="line">    SurfaceControl.openTransaction();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//布局水印</span></span><br><span class="line">        <span class="keyword">if</span> (mWatermark != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mWatermark.positionSurface(defaultDw, defaultDh);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//布局StrictMode的红色警告框</span></span><br><span class="line">        <span class="keyword">if</span> (mStrictModeFlash != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mStrictModeFlash.positionSurface(defaultDw, defaultDh);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (mCircularDisplayMask != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mCircularDisplayMask.positionSurface(defaultDw, defaultDh, mRotation);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (mEmulatorDisplayOverlay != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mEmulatorDisplayOverlay.positionSurface(defaultDw, defaultDh, mRotation);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="布局-DisplayContent"><a href="#布局-DisplayContent" class="headerlink" title="布局 DisplayContent"></a>布局 DisplayContent</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">      <span class="keyword">boolean</span> focusDisplayed = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//遍历 DisplayContent 列表</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> displayNdx = <span class="number">0</span>; displayNdx &lt; numDisplays; ++displayNdx) &#123;</span><br><span class="line">          <span class="keyword">final</span> DisplayContent displayContent = mDisplayContents.valueAt(displayNdx);</span><br><span class="line">          <span class="keyword">boolean</span> updateAllDrawn = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">          <span class="comment">//获取 displayContent 下的 窗口列表</span></span><br><span class="line">          WindowList windows = displayContent.getWindowList();</span><br><span class="line">          DisplayInfo displayInfo = displayContent.getDisplayInfo();</span><br><span class="line">          <span class="keyword">final</span> <span class="keyword">int</span> displayId = displayContent.getDisplayId();</span><br><span class="line">          <span class="comment">//当前 displayContent 所描述显示屏的逻辑尺寸</span></span><br><span class="line">          <span class="keyword">final</span> <span class="keyword">int</span> dw = displayInfo.logicalWidth;</span><br><span class="line">          <span class="keyword">final</span> <span class="keyword">int</span> dh = displayInfo.logicalHeight;</span><br><span class="line"></span><br><span class="line">          <span class="comment">//当前显示屏用于显示应用程序的区域尺寸。逻辑尺寸-系统装饰尺寸（状态栏 导航栏）</span></span><br><span class="line">          <span class="keyword">final</span> <span class="keyword">int</span> innerDw = displayInfo.appWidth;</span><br><span class="line">          <span class="keyword">final</span> <span class="keyword">int</span> innerDh = displayInfo.appHeight;</span><br><span class="line"></span><br><span class="line">          <span class="comment">//用来标识是否是默认的 displayContent（也就是手机屏幕），手机屏幕拥有状态栏、导航栏、并应输入事件，而其他屏幕没有这些特性。</span></span><br><span class="line">          <span class="keyword">final</span> <span class="keyword">boolean</span> isDefaultDisplay = (displayId == Display.DEFAULT_DISPLAY);</span><br><span class="line">				</span><br><span class="line">          <span class="comment">//重置 display 的参数</span></span><br><span class="line">          <span class="comment">// Reset for each display.</span></span><br><span class="line">          mInnerFields.mDisplayHasContent = <span class="keyword">false</span>;</span><br><span class="line">          mInnerFields.mPreferredRefreshRate = <span class="number">0</span>;</span><br><span class="line">          mInnerFields.mPreferredModeId = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">int</span> repeats = <span class="number">0</span>;</span><br><span class="line">          <span class="keyword">do</span> &#123;</span><br><span class="line">              repeats++;</span><br><span class="line">              <span class="comment">//限制最多尝试次数</span></span><br><span class="line">              <span class="keyword">if</span> (repeats &gt; <span class="number">6</span>) &#123;</span><br><span class="line">                  Slog.w(TAG, <span class="string">"Animation repeat aborted after too many iterations"</span>);</span><br><span class="line">                  displayContent.layoutNeeded = <span class="keyword">false</span>;</span><br><span class="line">                  <span class="keyword">break</span>;</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              <span class="keyword">if</span> (DEBUG_LAYOUT_REPEATS) debugLayoutRepeats(<span class="string">"On entry to LockedInner"</span>,</span><br><span class="line">                  displayContent.pendingLayoutChanges);</span><br><span class="line"></span><br><span class="line">              <span class="comment">// pendingLayoutChanges 含有 FINISH_LAYOUT_REDO_WALLPAPER 的处理</span></span><br><span class="line">              <span class="keyword">if</span> ((displayContent.pendingLayoutChanges &amp;</span><br><span class="line">                      WindowManagerPolicy.FINISH_LAYOUT_REDO_WALLPAPER) != <span class="number">0</span> &amp;&amp;</span><br><span class="line">                      adjustWallpaperWindowsLocked()) &#123;</span><br><span class="line">                  assignLayersLocked(windows);</span><br><span class="line">                  displayContent.layoutNeeded = <span class="keyword">true</span>;</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              <span class="comment">// pendingLayoutChanges 含有 FINISH_LAYOUT_REDO_CONFIG 的处理</span></span><br><span class="line">              <span class="keyword">if</span> (isDefaultDisplay &amp;&amp; (displayContent.pendingLayoutChanges</span><br><span class="line">                      &amp; WindowManagerPolicy.FINISH_LAYOUT_REDO_CONFIG) != <span class="number">0</span>) &#123;</span><br><span class="line">                  <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.v(TAG, <span class="string">"Computing new config from layout"</span>);</span><br><span class="line">                  <span class="keyword">if</span> (updateOrientationFromAppTokensLocked(<span class="keyword">true</span>)) &#123;</span><br><span class="line">                      displayContent.layoutNeeded = <span class="keyword">true</span>;</span><br><span class="line">                      mH.sendEmptyMessage(H.SEND_NEW_CONFIGURATION);</span><br><span class="line">                  &#125;</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              <span class="comment">// pendingLayoutChanges 含有 FINISH_LAYOUT_REDO_LAYOUT 的处理</span></span><br><span class="line">              <span class="keyword">if</span> ((displayContent.pendingLayoutChanges</span><br><span class="line">                      &amp; WindowManagerPolicy.FINISH_LAYOUT_REDO_LAYOUT) != <span class="number">0</span>) &#123;</span><br><span class="line">                  displayContent.layoutNeeded = <span class="keyword">true</span>;</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              <span class="comment">// FIRST LOOP: Perform a layout, if needed.</span></span><br><span class="line">              <span class="keyword">if</span> (repeats &lt; <span class="number">4</span>) &#123;</span><br><span class="line">                  <span class="comment">//完成对 displayContent 的所有窗口的布局工作 下一个章节分析的重点</span></span><br><span class="line">                  performLayoutLockedInner(displayContent, repeats == <span class="number">1</span>,</span><br><span class="line">                          <span class="keyword">false</span> <span class="comment">/*updateInputWindows*/</span>);</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  Slog.w(TAG, <span class="string">"Layout repeat skipped after too many iterations"</span>);</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              <span class="comment">//清空 pendingLayoutChanges 字段</span></span><br><span class="line">              <span class="comment">// FIRST AND ONE HALF LOOP: Make WindowManagerPolicy think</span></span><br><span class="line">              <span class="comment">// it is animating.</span></span><br><span class="line">              displayContent.pendingLayoutChanges = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">              <span class="comment">//PhoneWindowManager 来检查布局（结果检查）</span></span><br><span class="line">              <span class="keyword">if</span> (isDefaultDisplay) &#123;</span><br><span class="line"><span class="comment">//检查内容：状态栏 导航栏可见性是否与顶层窗口的属性冲突，是否需要解除锁屏状态等</span></span><br><span class="line">                  mPolicy.beginPostLayoutPolicyLw(dw, dh);</span><br><span class="line">                  <span class="keyword">for</span> (i = windows.size() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">                      WindowState w = windows.get(i);</span><br><span class="line">                      <span class="keyword">if</span> (w.mHasSurface) &#123;</span><br><span class="line">                          mPolicy.applyPostLayoutPolicyLw(w, w.mAttrs, w.mAttachedWindow);</span><br><span class="line">                      &#125;</span><br><span class="line">                  &#125;</span><br><span class="line">                  <span class="comment">//布局结果保存到 pendingLayoutChanges 字段</span></span><br><span class="line">                  displayContent.pendingLayoutChanges |= mPolicy.finishPostLayoutPolicyLw();</span><br><span class="line">                  <span class="keyword">if</span> (DEBUG_LAYOUT_REPEATS) debugLayoutRepeats(</span><br><span class="line">                      <span class="string">"after finishPostLayoutPolicyLw"</span>, displayContent.pendingLayoutChanges);</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="comment">//通过 pendingLayoutChanges 来判断是否需要重新检测</span></span><br><span class="line">          &#125; <span class="keyword">while</span> (displayContent.pendingLayoutChanges != <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="performLayoutLockedInner"><a href="#performLayoutLockedInner" class="headerlink" title="performLayoutLockedInner"></a>performLayoutLockedInner</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">performLayoutLockedInner</span><span class="params">(<span class="keyword">final</span> DisplayContent displayContent,</span></span></span><br><span class="line"><span class="function"><span class="params">                                  <span class="keyword">boolean</span> initial, <span class="keyword">boolean</span> updateInputWindows)</span> </span>&#123;</span><br><span class="line">Log.i(TAG, <span class="string">"performLayoutLockedInner-&gt;displayContent:"</span> + displayContent);</span><br><span class="line"><span class="comment">//if(displayContent.getDisplayId() != 0 &amp;&amp; isShowDualScreen())&#123;</span></span><br><span class="line"><span class="comment">//	return;</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">//layoutNeeded为true才执行布局操作</span></span><br><span class="line">      <span class="keyword">if</span> (!displayContent.layoutNeeded) &#123;</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      displayContent.layoutNeeded = <span class="keyword">false</span>;</span><br><span class="line">      WindowList windows = displayContent.getWindowList();</span><br><span class="line"></span><br><span class="line">      <span class="comment">//获取是否是手机屏幕参数</span></span><br><span class="line">      <span class="keyword">boolean</span> isDefaultDisplay = displayContent.isDefaultDisplay;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//获取屏幕的信息</span></span><br><span class="line">      DisplayInfo displayInfo = displayContent.getDisplayInfo();</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> dw = displayInfo.logicalWidth;</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> dh = displayInfo.logicalHeight;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (mInputConsumer != <span class="keyword">null</span>) &#123;</span><br><span class="line">          mInputConsumer.layout(dw, dh);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> N = windows.size();</span><br><span class="line">      <span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (DEBUG_LAYOUT) &#123;</span><br><span class="line">          Slog.v(TAG, <span class="string">"-------------------------------------"</span>);</span><br><span class="line">          Slog.v(TAG, <span class="string">"performLayout: needed="</span></span><br><span class="line">                  + displayContent.layoutNeeded + <span class="string">" dw="</span> + dw + <span class="string">" dh="</span> + dh);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//通知 PhoneWindowManager 开始布局准备</span></span><br><span class="line">      mPolicy.beginLayoutLw(isDefaultDisplay, dw, dh, mRotation);</span><br><span class="line">      <span class="keyword">if</span> (isDefaultDisplay) &#123;</span><br><span class="line">          mSystemDecorLayer = mPolicy.getSystemDecorLayerLw();</span><br><span class="line">          mScreenRect.set(<span class="number">0</span>, <span class="number">0</span>, dw, dh);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      mPolicy.getContentRectLw(mTmpContentRect);</span><br><span class="line">      displayContent.resize(mTmpContentRect);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">int</span> seq = mLayoutSeq+<span class="number">1</span>;</span><br><span class="line">      <span class="keyword">if</span> (seq &lt; <span class="number">0</span>) seq = <span class="number">0</span>;</span><br><span class="line">      mLayoutSeq = seq;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">boolean</span> behindDream = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//只是第一个非顶级窗口所在的index,用于节省查找时间</span></span><br><span class="line">      <span class="comment">// First perform layout of any root windows (not attached</span></span><br><span class="line">      <span class="comment">// to another window).</span></span><br><span class="line">      <span class="keyword">int</span> topAttached = -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//对顶级窗口进行布局</span></span><br><span class="line">      <span class="keyword">for</span> (i = N-<span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">          <span class="keyword">final</span> WindowState win = windows.get(i);</span><br><span class="line"></span><br><span class="line">          <span class="comment">//获取当前窗口是否可见</span></span><br><span class="line">          <span class="comment">// Don't do layout of a window if it is not visible, or</span></span><br><span class="line">          <span class="comment">// soon won't be visible, to avoid wasting time and funky</span></span><br><span class="line">          <span class="comment">// changes while a window is animating away.</span></span><br><span class="line">          <span class="keyword">final</span> <span class="keyword">boolean</span> gone = (behindDream &amp;&amp; mPolicy.canBeForceHidden(win, win.mAttrs))</span><br><span class="line">                  || win.isGoneForLayoutLw();</span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (DEBUG_LAYOUT &amp;&amp; !win.mLayoutAttached) &#123;</span><br><span class="line">              Slog.v(TAG, <span class="string">"1ST PASS "</span> + win</span><br><span class="line">                      + <span class="string">": gone="</span> + gone + <span class="string">" mHaveFrame="</span> + win.mHaveFrame</span><br><span class="line">                      + <span class="string">" mLayoutAttached="</span> + win.mLayoutAttached</span><br><span class="line">                      + <span class="string">" screen changed="</span> + win.isConfigChanged());</span><br><span class="line">              <span class="keyword">final</span> AppWindowToken atoken = win.mAppToken;</span><br><span class="line">              <span class="keyword">if</span> (gone) Slog.v(TAG, <span class="string">"  GONE: mViewVisibility="</span></span><br><span class="line">                      + win.mViewVisibility + <span class="string">" mRelayoutCalled="</span></span><br><span class="line">                      + win.mRelayoutCalled + <span class="string">" hidden="</span></span><br><span class="line">                      + win.mRootToken.hidden + <span class="string">" hiddenRequested="</span></span><br><span class="line">                      + (atoken != <span class="keyword">null</span> &amp;&amp; atoken.hiddenRequested)</span><br><span class="line">                      + <span class="string">" mAttachedHidden="</span> + win.mAttachedHidden);</span><br><span class="line">              <span class="keyword">else</span> Slog.v(TAG, <span class="string">"  VIS: mViewVisibility="</span></span><br><span class="line">                      + win.mViewVisibility + <span class="string">" mRelayoutCalled="</span></span><br><span class="line">                      + win.mRelayoutCalled + <span class="string">" hidden="</span></span><br><span class="line">                      + win.mRootToken.hidden + <span class="string">" hiddenRequested="</span></span><br><span class="line">                      + (atoken != <span class="keyword">null</span> &amp;&amp; atoken.hiddenRequested)</span><br><span class="line">                      + <span class="string">" mAttachedHidden="</span> + win.mAttachedHidden);</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="comment">//不可见则跳过</span></span><br><span class="line">          <span class="comment">// If this view is GONE, then skip it -- keep the current</span></span><br><span class="line">          <span class="comment">// frame, and let the caller know so they can ignore it</span></span><br><span class="line">          <span class="comment">// if they want.  (We do the normal layout for INVISIBLE</span></span><br><span class="line">          <span class="comment">// windows, since that means "perform layout as normal,</span></span><br><span class="line">          <span class="comment">// just don't display").</span></span><br><span class="line">          <span class="keyword">if</span> (!gone || !win.mHaveFrame || win.mLayoutNeeded</span><br><span class="line">                  || ((win.isConfigChanged() || win.setInsetsChanged()) &amp;&amp;</span><br><span class="line">                          ((win.mAttrs.privateFlags &amp; PRIVATE_FLAG_KEYGUARD) != <span class="number">0</span> ||</span><br><span class="line">                          (win.mHasSurface &amp;&amp; win.mAppToken != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                          win.mAppToken.layoutConfigChanges)))) &#123;</span><br><span class="line">              <span class="keyword">if</span> (!win.mLayoutAttached) &#123;</span><br><span class="line">                  <span class="comment">//这边只对顶级窗口进行布局处理</span></span><br><span class="line">                  <span class="keyword">if</span> (initial) &#123;</span><br><span class="line">                      <span class="comment">//Slog.i(TAG, "Window " + this + " clearing mContentChanged - initial");</span></span><br><span class="line">                      win.mContentChanged = <span class="keyword">false</span>;</span><br><span class="line">                  &#125;</span><br><span class="line">                  <span class="keyword">if</span> (win.mAttrs.type == TYPE_DREAM) &#123;</span><br><span class="line">                      <span class="comment">// Don't layout windows behind a dream, so that if it</span></span><br><span class="line">                      <span class="comment">// does stuff like hide the status bar we won't get a</span></span><br><span class="line">                      <span class="comment">// bad transition when it goes away.</span></span><br><span class="line">                      behindDream = <span class="keyword">true</span>;</span><br><span class="line">                  &#125;</span><br><span class="line">                  win.mLayoutNeeded = <span class="keyword">false</span>;</span><br><span class="line">                  <span class="comment">//通知窗体准备布局</span></span><br><span class="line">                  win.prelayout();</span><br><span class="line">                  <span class="comment">//mPolicy.layoutWindowLw(win, null);</span></span><br><span class="line">			DisplayInfo defaultDisplayInfo = getDefaultDisplayInfoLocked();</span><br><span class="line">			<span class="comment">//调用 PhoneWindowManager 的 layoutWindowLw 开始布局</span></span><br><span class="line">			mPolicy.layoutWindowLw(win ,<span class="keyword">null</span> ,defaultDisplayInfo.logicalWidth,defaultDisplayInfo.logicalHeight);</span><br><span class="line">			<span class="comment">//更新窗口的布局版本号</span></span><br><span class="line">                  win.mLayoutSeq = seq;</span><br><span class="line">                  <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.v(TAG, <span class="string">"  LAYOUT: mFrame="</span></span><br><span class="line">                          + win.mFrame + <span class="string">" mContainingFrame="</span></span><br><span class="line">                          + win.mContainingFrame + <span class="string">" mDisplayFrame="</span></span><br><span class="line">                          + win.mDisplayFrame);</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  <span class="comment">//当前窗口不是顶级窗口，则记录下这个位置，以便于后面快速定位到这里开始（这边只会记录下 第一个遇到的非顶级窗口）</span></span><br><span class="line">                  <span class="keyword">if</span> (topAttached &lt; <span class="number">0</span>) topAttached = i;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">boolean</span> attachedBehindDream = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//处理非顶级窗口（这边的处理历程和上面的顶级窗口的类似）</span></span><br><span class="line">      <span class="comment">// Now perform layout of attached windows, which usually</span></span><br><span class="line">      <span class="comment">// depend on the position of the window they are attached to.</span></span><br><span class="line">      <span class="comment">// XXX does not deal with windows that are attached to windows</span></span><br><span class="line">      <span class="comment">// that are themselves attached.</span></span><br><span class="line">      <span class="keyword">for</span> (i = topAttached; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">          <span class="keyword">final</span> WindowState win = windows.get(i);</span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (win.mLayoutAttached) &#123;</span><br><span class="line">              <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.v(TAG, <span class="string">"2ND PASS "</span> + win</span><br><span class="line">                      + <span class="string">" mHaveFrame="</span> + win.mHaveFrame</span><br><span class="line">                      + <span class="string">" mViewVisibility="</span> + win.mViewVisibility</span><br><span class="line">                      + <span class="string">" mRelayoutCalled="</span> + win.mRelayoutCalled);</span><br><span class="line">              <span class="comment">// If this view is GONE, then skip it -- keep the current</span></span><br><span class="line">              <span class="comment">// frame, and let the caller know so they can ignore it</span></span><br><span class="line">              <span class="comment">// if they want.  (We do the normal layout for INVISIBLE</span></span><br><span class="line">              <span class="comment">// windows, since that means "perform layout as normal,</span></span><br><span class="line">              <span class="comment">// just don't display").</span></span><br><span class="line">              <span class="keyword">if</span> (attachedBehindDream &amp;&amp; mPolicy.canBeForceHidden(win, win.mAttrs)) &#123;</span><br><span class="line">                  <span class="keyword">continue</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">if</span> ((win.mViewVisibility != View.GONE &amp;&amp; win.mRelayoutCalled)</span><br><span class="line">                      || !win.mHaveFrame || win.mLayoutNeeded) &#123;</span><br><span class="line">                  <span class="keyword">if</span> (initial) &#123;</span><br><span class="line">                      <span class="comment">//Slog.i(TAG, "Window " + this + " clearing mContentChanged - initial");</span></span><br><span class="line">                      win.mContentChanged = <span class="keyword">false</span>;</span><br><span class="line">                  &#125;</span><br><span class="line">                  win.mLayoutNeeded = <span class="keyword">false</span>;</span><br><span class="line">                  win.prelayout();</span><br><span class="line">                  <span class="comment">//mPolicy.layoutWindowLw(win, win.mAttachedWindow);</span></span><br><span class="line">			DisplayInfo defaultDisplayInfo = getDefaultDisplayInfoLocked();</span><br><span class="line">			<span class="comment">//更新布局</span></span><br><span class="line">    		mPolicy.layoutWindowLw(win, win.mAttachedWindow,defaultDisplayInfo.logicalWidth,defaultDisplayInfo.logicalHeight);</span><br><span class="line">		<span class="comment">//	mPolicy.layoutWindowLw(win, null, defaultDisplayInfo.logicalWidth,defaultDisplayInfo.logicalHeight);</span></span><br><span class="line">                  win.mLayoutSeq = seq;</span><br><span class="line">                  <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.v(TAG, <span class="string">"  LAYOUT: mFrame="</span></span><br><span class="line">                          + win.mFrame + <span class="string">" mContainingFrame="</span></span><br><span class="line">                          + win.mContainingFrame + <span class="string">" mDisplayFrame="</span></span><br><span class="line">                          + win.mDisplayFrame);</span><br><span class="line">              &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> <span class="keyword">if</span> (win.mAttrs.type == TYPE_DREAM) &#123;</span><br><span class="line">              <span class="comment">// Don't layout windows behind a dream, so that if it</span></span><br><span class="line">              <span class="comment">// does stuff like hide the status bar we won't get a</span></span><br><span class="line">              <span class="comment">// bad transition when it goes away.</span></span><br><span class="line">              attachedBehindDream = behindDream;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">      <span class="comment">//布局后窗口的大小和位置可能改变了，所以需要设置需要更新标识</span></span><br><span class="line">      <span class="comment">// Window frames may have changed.  Tell the input dispatcher about it.</span></span><br><span class="line">      mInputMonitor.setUpdateInputWindowsNeededLw();</span><br><span class="line">      <span class="keyword">if</span> (updateInputWindows) &#123;</span><br><span class="line">          mInputMonitor.updateInputWindowsLw(<span class="keyword">false</span> <span class="comment">/*force*/</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//通知布局完成</span></span><br><span class="line">      mPolicy.finishLayoutLw();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="PhoneWindowManager-的-beginLayoutLw-方法"><a href="#PhoneWindowManager-的-beginLayoutLw-方法" class="headerlink" title="PhoneWindowManager 的 beginLayoutLw 方法"></a>PhoneWindowManager 的 beginLayoutLw 方法</h5><p>这个方法为布局准备了一些用到的参数，这些参数描述了屏幕上的8个矩形区域，这8个区域构成了 PhoneWindowManager 布局窗口的准绳。</p>
+<ul>
+<li>描述整个屏幕的逻辑显示区域<ul>
+<li>mUnrestrictedScreenLeft</li>
+<li>mUnrestrictedScreenTop</li>
+<li>mUnrestrictedScreenWidth</li>
+<li>mUnrestrictedScreenHeight</li>
+</ul>
+</li>
+<li><p>描述了屏幕除去导航栏之后的区域，导航栏不可见的时候，跟上面的值是相等的</p>
+<ul>
+<li>mRestrictedScreenLeft</li>
+<li>mRestrictedScreenTop</li>
+<li>mRestrictedScreenWidth</li>
+<li>mRestrictedScreenHeight</li>
+</ul>
+</li>
+<li><p>描述整个屏幕的逻辑显示区域</p>
+<ul>
+<li>mStableFullscreenLeft</li>
+<li>mStableFullscreenTop</li>
+<li>mStableFullscreenRight</li>
+<li>mStableFullscreenBottom</li>
+</ul>
+</li>
+<li><p>描述排除状态栏和导航栏之外的区域。并且不受可见性影响</p>
+<ul>
+<li>mStableLeft</li>
+<li>mStableTop</li>
+<li>mStableRight</li>
+<li>mStableBottom</li>
+</ul>
+</li>
+</ul>
+<p>StableFull和Stable不直接参与窗口的布局过程。只是为了提供一个不受可见性影响的显示区域大小和位置</p>
+<ul>
+<li><p>Dock区域用来描述可用来放置停靠窗口的区域。停靠指的是显示在屏幕某一侧的半屏窗口。Dock区域主要用途是用来作为输入法窗口的布局容器。</p>
+<ul>
+<li>mDockLeft</li>
+<li>mDockTop</li>
+<li>mDockRight</li>
+<li>mDockBottom</li>
+</ul>
+</li>
+<li><p>描述屏幕中排除状态栏、导航栏、输入法后的显示区域。</p>
+<ul>
+<li>mContentLeft</li>
+<li>mContentTop</li>
+<li>mContentRight</li>
+<li>mContentBottom</li>
+</ul>
+</li>
+<li><p>与 Content 区域一样，大部分情况下，大部分情况下，cur区域与Content区域是相同的。</p>
+<ul>
+<li>mCurLeft</li>
+<li>mCurTop</li>
+<li>mCurRight</li>
+<li>mCurBottom</li>
+</ul>
+</li>
+</ul>
+<p>cur区域与Content区域和别的区域计算的方法不一样，这两个的区域不是在 beginLayoutLw 中被确定下来。因为这两个区域受输入法窗口尺寸的影响，所以需要在输入法窗口完成布局后，在 offsetInputMethodWindowLw 方法中得到最终的位置。在此之前，它们与Dock区域是一样的。</p>
+<ul>
+<li>与Dock区域绝大多数情况是相同的。状态栏和导航栏的可见性发生变化时会有一个淡入淡出的动画效果，这两个区域在这个过程中是不一致的。Dock认为这时候，导航栏和状态栏是可见的，system则认为是不可见的。<ul>
+<li>mSystemLeft</li>
+<li>mSystemTop</li>
+<li>mSystemRight</li>
+<li>mSystemBottom</li>
+</ul>
+</li>
+</ul>
+<p>上面这些值可以使用dumpsys window来查看 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">WINDOW MANAGER POLICY STATE (dumpsys window policy)</span><br><span class="line">    mSafeMode=false mSystemReady=true mSystemBooted=true</span><br><span class="line">    mLidState=-1 mLidOpenRotation=-1 mCameraLensCoverState=-1 mHdmiPlugged=false</span><br><span class="line">    mLastSystemUiFlags=0x8600 mResettingSystemUiFlags=0x0 mForceClearedSystemUiFlags=0x0</span><br><span class="line">    mWakeGestureEnabledSetting=true</span><br><span class="line">    mSupportAutoRotation=true</span><br><span class="line">    mUiMode=1 mDockMode=0 mCarDockRotation=-1 mDeskDockRotation=-1</span><br><span class="line">    mUserRotationMode=0 mUserRotation=0 mAllowAllRotations=0</span><br><span class="line">    mCurrentAppOrientation=-1</span><br><span class="line">    mCarDockEnablesAccelerometer=true mDeskDockEnablesAccelerometer=true</span><br><span class="line">    mLidKeyboardAccessibility=0 mLidNavigationAccessibility=0 mLidControlsSleep=false</span><br><span class="line">    mShortPressOnPowerBehavior=1 mLongPressOnPowerBehavior=1</span><br><span class="line">    mDoublePressOnPowerBehavior=0 mTriplePressOnPowerBehavior=0</span><br><span class="line">    mHasSoftInput=true</span><br><span class="line">    mAwake=true</span><br><span class="line">    mScreenOnEarly=true mScreenOnFully=true</span><br><span class="line">    mKeyguardDrawComplete=true mWindowManagerDrawComplete=true</span><br><span class="line">    mOrientationSensorEnabled=true</span><br><span class="line">    mOverscanScreen=(0,0) 1080x1920</span><br><span class="line">    mRestrictedOverscanScreen=(0,0) 1080x1794</span><br><span class="line">    mUnrestrictedScreen=(0,0) 1080x1920</span><br><span class="line">    mRestrictedScreen=(0,0) 1080x1794</span><br><span class="line">    mStableFullscreen=(0,0)-(1080,1794)</span><br><span class="line">    mStable=(0,63)-(1080,1794)</span><br><span class="line">    mSystem=(0,0)-(1080,1920)</span><br><span class="line">    mCur=(0,63)-(1080,1794)</span><br><span class="line">    mContent=(0,63)-(1080,1794)</span><br><span class="line">    mVoiceContent=(0,63)-(1080,1794)</span><br><span class="line">    mDock=(0,63)-(1080,1794)</span><br><span class="line">    mDockLayer=268435456 mStatusBarLayer=161000</span><br><span class="line">    mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mDreamingSleepToken=null</span><br><span class="line">    mStatusBar=Window&#123;285e842 u0 StatusBar&#125; isStatusBarKeyguard=false</span><br><span class="line">    mNavigationBar=Window&#123;7e294a7 u0 NavigationBar&#125;</span><br><span class="line">    mFocusedWindow=Window&#123;f3be5be u0 com.newland.kotlindagger2/com.newland.kotlindagger2.MainActivity&#125;</span><br><span class="line">    mFocusedApp=Token&#123;2ecfac5 ActivityRecord&#123;c866d3c u0 com.newland.kotlindagger2/.MainActivity t204&#125;&#125;</span><br><span class="line">    mTopFullscreenOpaqueWindowState=Window&#123;f3be5be u0 com.newland.kotlindagger2/com.newland.kotlindagger2.MainActivity&#125;</span><br><span class="line">    mTopFullscreenOpaqueOrDimmingWindowState=Window&#123;f3be5be u0 com.newland.kotlindagger2/com.newland.kotlindagger2.MainActivity&#125;</span><br><span class="line">    mTopIsFullscreen=false mHideLockScreen=false</span><br><span class="line">    mForceStatusBar=false mForceStatusBarFromKeyguard=false</span><br><span class="line">    mDismissKeyguard=0 mWinDismissingKeyguard=null mHomePressed=false</span><br><span class="line">    mAllowLockscreenWhenOn=false mLockScreenTimeout=60000 mLockScreenTimerActive=false</span><br><span class="line">    mEndcallBehavior=2 mIncallPowerBehavior=1 mLongPressOnHomeBehavior=0</span><br><span class="line">    mLandscapeRotation=1 mSeascapeRotation=3</span><br><span class="line">    mPortraitRotation=0 mUpsideDownRotation=2</span><br><span class="line">    mDemoHdmiRotation=1 mDemoHdmiRotationLock=false</span><br><span class="line">    mUndockedHdmiRotation=-1</span><br><span class="line">    mKeyMapping.size=0</span><br><span class="line">    BarController.StatusBar</span><br><span class="line">      mState=WINDOW_STATE_SHOWING</span><br><span class="line">      mTransientBar=TRANSIENT_BAR_NONE</span><br><span class="line">    BarController.NavigationBar</span><br><span class="line">      mState=WINDOW_STATE_SHOWING</span><br><span class="line">      mTransientBar=TRANSIENT_BAR_NONE</span><br><span class="line">    PolicyControl.sImmersiveStatusFilter=null</span><br><span class="line">    PolicyControl.sImmersiveNavigationFilter=null</span><br><span class="line">    PolicyControl.sImmersivePreconfirmationsFilter=null</span><br><span class="line">    WakeGestureListener</span><br><span class="line">      mTriggerRequested=false</span><br><span class="line">      mSensor=null</span><br><span class="line">    WindowOrientationListener</span><br><span class="line">      mEnabled=true</span><br><span class="line">      mCurrentRotation=0</span><br><span class="line">      mSensor=&#123;Sensor name=&quot;Goldfish 3-axis Accelerometer&quot;, vendor=&quot;The Android Open Source Project&quot;, version=1, type=1, maxRange=2.8, resolution=2.480159E-4, power=3.0, minDelay=10000&#125;</span><br><span class="line">      mRate=2</span><br><span class="line">      mProposedRotation=0</span><br><span class="line">      mPredictedRotation=0</span><br><span class="line">      mLastFilteredX=0.0</span><br><span class="line">      mLastFilteredY=9.77631</span><br><span class="line">      mLastFilteredZ=0.812348</span><br><span class="line">      mLastFilteredTimestampNanos=72661454232816 (4.412ms ago)</span><br><span class="line">      mTiltHistory=&#123;last: 5.0&#125;</span><br><span class="line">      mFlat=false</span><br><span class="line">      mSwinging=false</span><br><span class="line">      mAccelerating=false</span><br><span class="line">      mOverhead=false</span><br><span class="line">      mTouched=false</span><br><span class="line">      mTiltToleranceConfig=[[-25, 70], [-25, 65], [-25, 60], [-25, 65]]</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beginLayoutLw</span><span class="params">(<span class="keyword">boolean</span> isDefaultDisplay, <span class="keyword">int</span> displayWidth, <span class="keyword">int</span> displayHeight,</span></span></span><br><span class="line"><span class="function"><span class="params">                          <span class="keyword">int</span> displayRotation)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> overscanLeft, overscanTop, overscanRight, overscanBottom;</span><br><span class="line">    <span class="keyword">if</span> (isDefaultDisplay) &#123;</span><br><span class="line">        <span class="keyword">switch</span> (displayRotation) &#123;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_90:</span><br><span class="line">                overscanLeft = mOverscanTop;</span><br><span class="line">                overscanTop = mOverscanRight;</span><br><span class="line">                overscanRight = mOverscanBottom;</span><br><span class="line">                overscanBottom = mOverscanLeft;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_180:</span><br><span class="line">                overscanLeft = mOverscanRight;</span><br><span class="line">                overscanTop = mOverscanBottom;</span><br><span class="line">                overscanRight = mOverscanLeft;</span><br><span class="line">                overscanBottom = mOverscanTop;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_270:</span><br><span class="line">                overscanLeft = mOverscanBottom;</span><br><span class="line">                overscanTop = mOverscanLeft;</span><br><span class="line">                overscanRight = mOverscanTop;</span><br><span class="line">                overscanBottom = mOverscanRight;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                overscanLeft = mOverscanLeft;</span><br><span class="line">                overscanTop = mOverscanTop;</span><br><span class="line">                overscanRight = mOverscanRight;</span><br><span class="line">                overscanBottom = mOverscanBottom;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        overscanLeft = <span class="number">0</span>;</span><br><span class="line">        overscanTop = <span class="number">0</span>;</span><br><span class="line">        overscanRight = <span class="number">0</span>;</span><br><span class="line">        overscanBottom = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    mOverscanScreenLeft = mRestrictedOverscanScreenLeft = <span class="number">0</span>;</span><br><span class="line">    mOverscanScreenTop = mRestrictedOverscanScreenTop = <span class="number">0</span>;</span><br><span class="line">    mOverscanScreenWidth = mRestrictedOverscanScreenWidth = displayWidth;</span><br><span class="line">    mOverscanScreenHeight = mRestrictedOverscanScreenHeight = displayHeight;</span><br><span class="line">    mSystemLeft = <span class="number">0</span>;</span><br><span class="line">    mSystemTop = <span class="number">0</span>;</span><br><span class="line">    mSystemRight = displayWidth;</span><br><span class="line">    mSystemBottom = displayHeight;</span><br><span class="line">    mUnrestrictedScreenLeft = overscanLeft;</span><br><span class="line">    mUnrestrictedScreenTop = overscanTop;</span><br><span class="line">    mUnrestrictedScreenWidth = displayWidth - overscanLeft - overscanRight;</span><br><span class="line">    mUnrestrictedScreenHeight = displayHeight - overscanTop - overscanBottom;</span><br><span class="line">    mRestrictedScreenLeft = mUnrestrictedScreenLeft;</span><br><span class="line">    mRestrictedScreenTop = mUnrestrictedScreenTop;</span><br><span class="line">    mRestrictedScreenWidth = mSystemGestures.screenWidth = mUnrestrictedScreenWidth;</span><br><span class="line">    mRestrictedScreenHeight = mSystemGestures.screenHeight = mUnrestrictedScreenHeight;</span><br><span class="line">    mDockLeft = mContentLeft = mVoiceContentLeft = mStableLeft = mStableFullscreenLeft</span><br><span class="line">            = mCurLeft = mUnrestrictedScreenLeft;</span><br><span class="line">    mDockTop = mContentTop = mVoiceContentTop = mStableTop = mStableFullscreenTop</span><br><span class="line">            = mCurTop = mUnrestrictedScreenTop;</span><br><span class="line">    mDockRight = mContentRight = mVoiceContentRight = mStableRight = mStableFullscreenRight</span><br><span class="line">            = mCurRight = displayWidth - overscanRight;</span><br><span class="line">    mDockBottom = mContentBottom = mVoiceContentBottom = mStableBottom = mStableFullscreenBottom</span><br><span class="line">            = mCurBottom = displayHeight - overscanBottom;</span><br><span class="line">    mDockLayer = <span class="number">0x10000000</span>;</span><br><span class="line">    mStatusBarLayer = -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// start with the current dock rect, which will be (0,0,displayWidth,displayHeight)</span></span><br><span class="line">    <span class="keyword">final</span> Rect pf = mTmpParentFrame;</span><br><span class="line">    <span class="keyword">final</span> Rect df = mTmpDisplayFrame;</span><br><span class="line">    <span class="keyword">final</span> Rect of = mTmpOverscanFrame;</span><br><span class="line">    <span class="keyword">final</span> Rect vf = mTmpVisibleFrame;</span><br><span class="line">    <span class="keyword">final</span> Rect dcf = mTmpDecorFrame;</span><br><span class="line">    pf.left = df.left = of.left = vf.left = mDockLeft;</span><br><span class="line">    pf.top = df.top = of.top = vf.top = mDockTop;</span><br><span class="line">    pf.right = df.right = of.right = vf.right = mDockRight;</span><br><span class="line">    pf.bottom = df.bottom = of.bottom = vf.bottom = mDockBottom;</span><br><span class="line">    dcf.setEmpty();  <span class="comment">// Decor frame N/A for system bars.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (isDefaultDisplay) &#123;</span><br><span class="line">        <span class="comment">// For purposes of putting out fake window up to steal focus, we will</span></span><br><span class="line">        <span class="comment">// drive nav being hidden only by whether it is requested.</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> sysui = mLastSystemUiFlags;</span><br><span class="line">        <span class="keyword">boolean</span> navVisible = (sysui &amp; View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">boolean</span> navTranslucent = (sysui</span><br><span class="line">                &amp; (View.NAVIGATION_BAR_TRANSLUCENT | View.SYSTEM_UI_TRANSPARENT)) != <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">boolean</span> immersive = (sysui &amp; View.SYSTEM_UI_FLAG_IMMERSIVE) != <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">boolean</span> immersiveSticky = (sysui &amp; View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) != <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">boolean</span> navAllowedHidden = immersive || immersiveSticky;</span><br><span class="line">        navTranslucent &amp;= !immersiveSticky;  <span class="comment">// transient trumps translucent</span></span><br><span class="line">        <span class="keyword">boolean</span> isKeyguardShowing = isStatusBarKeyguard() &amp;&amp; !mHideLockScreen;</span><br><span class="line">        <span class="keyword">if</span> (!isKeyguardShowing) &#123;</span><br><span class="line">            navTranslucent &amp;= areTranslucentBarsAllowed();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// When the navigation bar isn't visible, we put up a fake</span></span><br><span class="line">        <span class="comment">// input window to catch all touch events.  This way we can</span></span><br><span class="line">        <span class="comment">// detect when the user presses anywhere to bring back the nav</span></span><br><span class="line">        <span class="comment">// bar and ensure the application doesn't see the event.</span></span><br><span class="line">        <span class="keyword">if</span> (navVisible || navAllowedHidden) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mHideNavFakeWindow != <span class="keyword">null</span>) &#123;</span><br><span class="line">                mHideNavFakeWindow.dismiss();</span><br><span class="line">                mHideNavFakeWindow = <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mHideNavFakeWindow == <span class="keyword">null</span>) &#123;</span><br><span class="line">            mHideNavFakeWindow = mWindowManagerFuncs.addFakeWindow(</span><br><span class="line">                    mHandler.getLooper(), mHideNavInputEventReceiverFactory,</span><br><span class="line">                    <span class="string">"hidden nav"</span>, WindowManager.LayoutParams.TYPE_HIDDEN_NAV_CONSUMER, <span class="number">0</span>,</span><br><span class="line">                    <span class="number">0</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// For purposes of positioning and showing the nav bar, if we have</span></span><br><span class="line">        <span class="comment">// decided that it can't be hidden (because of the screen aspect ratio),</span></span><br><span class="line">        <span class="comment">// then take that into account.</span></span><br><span class="line">        navVisible |= !canHideNavigationBar();</span><br><span class="line">        <span class="keyword">if</span>((mLastSystemUiFlags &amp; View.SYSTEM_UI_FLAG_SHOW_FULLSCREEN) != <span class="number">0</span>)&#123;</span><br><span class="line">            navVisible = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> updateSysUiVisibility = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (mNavigationBar != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">boolean</span> transientNavBarShowing = mNavigationBarController.isTransientShowing();</span><br><span class="line">            <span class="comment">// Force the navigation bar to its appropriate place and</span></span><br><span class="line">            <span class="comment">// size.  We need to do this directly, instead of relying on</span></span><br><span class="line">            <span class="comment">// it to bubble up from the nav bar, because this needs to</span></span><br><span class="line">            <span class="comment">// change atomically with screen rotations.</span></span><br><span class="line">            mNavigationBarOnBottom = (!mNavigationBarCanMove || displayWidth &lt; displayHeight);</span><br><span class="line">            <span class="keyword">if</span> (mNavigationBarOnBottom) &#123;</span><br><span class="line">                <span class="comment">// It's a system nav bar or a portrait screen; nav bar goes on bottom.</span></span><br><span class="line">                <span class="keyword">int</span> top = displayHeight - overscanBottom</span><br><span class="line">                        - mNavigationBarHeightForRotation[displayRotation];</span><br><span class="line">                mTmpNavigationFrame.set(<span class="number">0</span>, top, displayWidth, displayHeight - overscanBottom);</span><br><span class="line">                mStableBottom = mStableFullscreenBottom = mTmpNavigationFrame.top;</span><br><span class="line">                <span class="keyword">if</span> (transientNavBarShowing) &#123;</span><br><span class="line">                    mNavigationBarController.setBarShowingLw(<span class="keyword">true</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (navVisible) &#123;</span><br><span class="line">                    mNavigationBarController.setBarShowingLw(<span class="keyword">true</span>);</span><br><span class="line">                    mDockBottom = mTmpNavigationFrame.top;</span><br><span class="line">                    mRestrictedScreenHeight = mDockBottom - mRestrictedScreenTop;</span><br><span class="line">                    mRestrictedOverscanScreenHeight = mDockBottom - mRestrictedOverscanScreenTop;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// We currently want to hide the navigation UI.</span></span><br><span class="line">                    mNavigationBarController.setBarShowingLw(<span class="keyword">false</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (navVisible &amp;&amp; !navTranslucent &amp;&amp; !navAllowedHidden</span><br><span class="line">                        &amp;&amp; !mNavigationBar.isAnimatingLw()</span><br><span class="line">                        &amp;&amp; !mNavigationBarController.wasRecentlyTranslucent()) &#123;</span><br><span class="line">                    <span class="comment">// If the opaque nav bar is currently requested to be visible,</span></span><br><span class="line">                    <span class="comment">// and not in the process of animating on or off, then</span></span><br><span class="line">                    <span class="comment">// we can tell the app that it is covered by it.</span></span><br><span class="line">                    mSystemBottom = mTmpNavigationFrame.top;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// Landscape screen; nav bar goes to the right.</span></span><br><span class="line">                <span class="keyword">int</span> left = displayWidth - overscanRight</span><br><span class="line">                        - mNavigationBarWidthForRotation[displayRotation];</span><br><span class="line">                mTmpNavigationFrame.set(left, <span class="number">0</span>, displayWidth - overscanRight, displayHeight);</span><br><span class="line">                mStableRight = mStableFullscreenRight = mTmpNavigationFrame.left;</span><br><span class="line">                <span class="keyword">if</span> (transientNavBarShowing) &#123;</span><br><span class="line">                    mNavigationBarController.setBarShowingLw(<span class="keyword">true</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (navVisible) &#123;</span><br><span class="line">                    mNavigationBarController.setBarShowingLw(<span class="keyword">true</span>);</span><br><span class="line">                    mDockRight = mTmpNavigationFrame.left;</span><br><span class="line">                    mRestrictedScreenWidth = mDockRight - mRestrictedScreenLeft;</span><br><span class="line">                    mRestrictedOverscanScreenWidth = mDockRight - mRestrictedOverscanScreenLeft;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// We currently want to hide the navigation UI.</span></span><br><span class="line">                    mNavigationBarController.setBarShowingLw(<span class="keyword">false</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (navVisible &amp;&amp; !navTranslucent &amp;&amp; !mNavigationBar.isAnimatingLw()</span><br><span class="line">                        &amp;&amp; !mNavigationBarController.wasRecentlyTranslucent()) &#123;</span><br><span class="line">                    <span class="comment">// If the nav bar is currently requested to be visible,</span></span><br><span class="line">                    <span class="comment">// and not in the process of animating on or off, then</span></span><br><span class="line">                    <span class="comment">// we can tell the app that it is covered by it.</span></span><br><span class="line">                    mSystemRight = mTmpNavigationFrame.left;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// Make sure the content and current rectangles are updated to</span></span><br><span class="line">            <span class="comment">// account for the restrictions from the navigation bar.</span></span><br><span class="line">            mContentTop = mVoiceContentTop = mCurTop = mDockTop;</span><br><span class="line">            mContentBottom = mVoiceContentBottom = mCurBottom = mDockBottom;</span><br><span class="line">            mContentLeft = mVoiceContentLeft = mCurLeft = mDockLeft;</span><br><span class="line">            mContentRight = mVoiceContentRight = mCurRight = mDockRight;</span><br><span class="line">            mStatusBarLayer = mNavigationBar.getSurfaceLayer();</span><br><span class="line">            <span class="comment">// And compute the final frame.</span></span><br><span class="line">            mNavigationBar.computeFrameLw(mTmpNavigationFrame, mTmpNavigationFrame,</span><br><span class="line">                    mTmpNavigationFrame, mTmpNavigationFrame, mTmpNavigationFrame, dcf,</span><br><span class="line">                    mTmpNavigationFrame);</span><br><span class="line">            <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.i(TAG, <span class="string">"mNavigationBar frame: "</span> + mTmpNavigationFrame);</span><br><span class="line">            <span class="keyword">if</span> (mNavigationBarController.checkHiddenLw()) &#123;</span><br><span class="line">                updateSysUiVisibility = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.i(TAG, String.format(<span class="string">"mDock rect: (%d,%d - %d,%d)"</span>,</span><br><span class="line">                mDockLeft, mDockTop, mDockRight, mDockBottom));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// decide where the status bar goes ahead of time</span></span><br><span class="line">        <span class="keyword">if</span> (mStatusBar != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// apply any navigation bar insets</span></span><br><span class="line">            pf.left = df.left = of.left = mUnrestrictedScreenLeft;</span><br><span class="line">            pf.top = df.top = of.top = mUnrestrictedScreenTop;</span><br><span class="line">            pf.right = df.right = of.right = mUnrestrictedScreenWidth + mUnrestrictedScreenLeft;</span><br><span class="line">            pf.bottom = df.bottom = of.bottom = mUnrestrictedScreenHeight</span><br><span class="line">                    + mUnrestrictedScreenTop;</span><br><span class="line">            vf.left = mStableLeft;</span><br><span class="line">            vf.top = mStableTop;</span><br><span class="line">            vf.right = mStableRight;</span><br><span class="line">            vf.bottom = mStableBottom;</span><br><span class="line"></span><br><span class="line">            mStatusBarLayer = mStatusBar.getSurfaceLayer();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Let the status bar determine its size.</span></span><br><span class="line">            mStatusBar.computeFrameLw(pf, df, vf, vf, vf, dcf, vf);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// For layout, the status bar is always at the top with our fixed height.</span></span><br><span class="line">            mStableTop = mUnrestrictedScreenTop + mStatusBarHeight;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">boolean</span> statusBarTransient = (sysui &amp; View.STATUS_BAR_TRANSIENT) != <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">boolean</span> statusBarTranslucent = (sysui</span><br><span class="line">                    &amp; (View.STATUS_BAR_TRANSLUCENT | View.SYSTEM_UI_TRANSPARENT)) != <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">if</span> (!isKeyguardShowing) &#123;</span><br><span class="line">                statusBarTranslucent &amp;= areTranslucentBarsAllowed();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// If the status bar is hidden, we don't want to cause</span></span><br><span class="line">            <span class="comment">// windows behind it to scroll.</span></span><br><span class="line">            <span class="keyword">if</span> (mStatusBar.isVisibleLw() &amp;&amp; !statusBarTransient) &#123;</span><br><span class="line">                <span class="comment">// Status bar may go away, so the screen area it occupies</span></span><br><span class="line">                <span class="comment">// is available to apps but just covering them when the</span></span><br><span class="line">                <span class="comment">// status bar is visible.</span></span><br><span class="line">                mDockTop = mUnrestrictedScreenTop + mStatusBarHeight;</span><br><span class="line"></span><br><span class="line">                mContentTop = mVoiceContentTop = mCurTop = mDockTop;</span><br><span class="line">                mContentBottom = mVoiceContentBottom = mCurBottom = mDockBottom;</span><br><span class="line">                mContentLeft = mVoiceContentLeft = mCurLeft = mDockLeft;</span><br><span class="line">                mContentRight = mVoiceContentRight = mCurRight = mDockRight;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.v(TAG, <span class="string">"Status bar: "</span> +</span><br><span class="line">                    String.format(</span><br><span class="line">                        <span class="string">"dock=[%d,%d][%d,%d] content=[%d,%d][%d,%d] cur=[%d,%d][%d,%d]"</span>,</span><br><span class="line">                        mDockLeft, mDockTop, mDockRight, mDockBottom,</span><br><span class="line">                        mContentLeft, mContentTop, mContentRight, mContentBottom,</span><br><span class="line">                        mCurLeft, mCurTop, mCurRight, mCurBottom));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (mStatusBar.isVisibleLw() &amp;&amp; !mStatusBar.isAnimatingLw()</span><br><span class="line">                    &amp;&amp; !statusBarTransient &amp;&amp; !statusBarTranslucent</span><br><span class="line">                    &amp;&amp; !mStatusBarController.wasRecentlyTranslucent()) &#123;</span><br><span class="line">                <span class="comment">// If the opaque status bar is currently requested to be visible,</span></span><br><span class="line">                <span class="comment">// and not in the process of animating on or off, then</span></span><br><span class="line">                <span class="comment">// we can tell the app that it is covered by it.</span></span><br><span class="line">                mSystemTop = mUnrestrictedScreenTop + mStatusBarHeight;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (mStatusBarController.checkHiddenLw()) &#123;</span><br><span class="line">                updateSysUiVisibility = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (updateSysUiVisibility) &#123;</span><br><span class="line">            updateSystemUiVisibilityLw();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="PhoneWindowManager-的-layoutWindowLw-方法"><a href="#PhoneWindowManager-的-layoutWindowLw-方法" class="headerlink" title="PhoneWindowManager 的 layoutWindowLw 方法"></a>PhoneWindowManager 的 layoutWindowLw 方法</h5><p>layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和尺寸。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">  <span class="comment">/** &#123;<span class="doctag">@inheritDoc</span>&#125; */</span></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">layoutWindowLw</span><span class="params">(WindowState win, WindowState attached)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//状态栏和导航栏不再被布局。因为这两个在 beginLayoutLw 方法中计算布局参数时完成</span></span><br><span class="line">      <span class="comment">// We've already done the navigation bar and status bar. If the status bar can receive</span></span><br><span class="line">      <span class="comment">// input, we need to layout it again to accomodate for the IME window.</span></span><br><span class="line">      <span class="keyword">if</span> ((win == mStatusBar &amp;&amp; !canReceiveInput(win)) || win == mNavigationBar) &#123;</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">final</span> WindowManager.LayoutParams attrs = win.getAttrs();</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">boolean</span> isDefaultDisplay = win.isDefaultDisplay();</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">boolean</span> needsToOffsetInputMethodTarget = isDefaultDisplay &amp;&amp;</span><br><span class="line">              (win == mLastInputMethodTargetWindow &amp;&amp; mLastInputMethodWindow != <span class="keyword">null</span>);</span><br><span class="line">      <span class="keyword">if</span> (needsToOffsetInputMethodTarget) &#123;</span><br><span class="line">          <span class="keyword">if</span> (DEBUG_LAYOUT) Slog.i(TAG, <span class="string">"Offset ime target window by the last ime window state"</span>);</span><br><span class="line">          offsetInputMethodWindowLw(mLastInputMethodWindow);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> fl = PolicyControl.getWindowFlags(win, attrs);</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> sim = attrs.softInputMode;</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> sysUiFl = PolicyControl.getSystemUiVisibility(win, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">      <span class="comment">//提供这四个矩形变量作为缓存，后续的计算中会更新这四个矩形内容</span></span><br><span class="line">      <span class="keyword">final</span> Rect pf = mTmpParentFrame;</span><br><span class="line">      <span class="keyword">final</span> Rect df = mTmpDisplayFrame;</span><br><span class="line">      <span class="keyword">final</span> Rect of = mTmpOverscanFrame;</span><br><span class="line">      <span class="keyword">final</span> Rect cf = mTmpContentFrame;</span><br><span class="line">      <span class="keyword">final</span> Rect vf = mTmpVisibleFrame;</span><br><span class="line">      <span class="keyword">final</span> Rect dcf = mTmpDecorFrame;</span><br><span class="line">      <span class="keyword">final</span> Rect sf = mTmpStableFrame;</span><br><span class="line">      <span class="comment">//下面是做这些内容的更新</span></span><br><span class="line"></span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">      <span class="comment">//将计算好的矩形交给windowstate,有窗口自己计算自己的布局结果</span></span><br><span class="line">      win.computeFrameLw(pf, df, of, cf, vf, dcf, sf, osf);</span><br><span class="line"></span><br><span class="line">      <span class="comment">//完成输入法窗口布局后需要更新 content 和 cur 区域就是在这里完成的</span></span><br><span class="line">      <span class="comment">// Dock windows carve out the bottom of the screen, so normal windows</span></span><br><span class="line">      <span class="comment">// can't appear underneath them.</span></span><br><span class="line">      <span class="keyword">if</span> (attrs.type == TYPE_INPUT_METHOD &amp;&amp; win.isVisibleOrBehindKeyguardLw()</span><br><span class="line">              &amp;&amp; !win.getGivenInsetsPendingLw()) &#123;</span><br><span class="line">          setLastInputMethodWindowLw(<span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">          offsetInputMethodWindowLw(win);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (attrs.type == TYPE_VOICE_INTERACTION &amp;&amp; win.isVisibleOrBehindKeyguardLw()</span><br><span class="line">              &amp;&amp; !win.getGivenInsetsPendingLw()) &#123;</span><br><span class="line">          offsetVoiceInputWindowLw(win);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h6 id="WindowState-的-computeFrameLw-方法"><a href="#WindowState-的-computeFrameLw-方法" class="headerlink" title="WindowState 的 computeFrameLw 方法"></a>WindowState 的 computeFrameLw 方法</h6><p>该方法的产出</p>
+<ul>
+<li>mFrame:描述窗口的位置和尺寸</li>
+<li></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> pf 描述放置窗口的位置和尺寸  LayoutParam 中的x,y,width,height以及gravity等都是相对pf进行计算的。根据窗口类型和flag不同，pf可能是 Restricted Unrestricted Dock Content。</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> df 用来限定窗口的最终位置。当窗口通过pf完成位置和尺寸的计算后，需要通过df再进行一次校正，必须完成位于df之内。 绝大部分情况和pf保持一致。</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> of</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> cf cf不会直接影响窗口布局位置和尺寸，但是影响到窗口内容的绘制。cf表示当前屏幕排除所有系统窗口（状态 导航 输入法）后所留下的矩形区域。根据 LayoutParams.softInputMode以及flag取值不同可能是 Content Dock Restricted</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> vf 跟cf一样，表示不被任何系统串口所遮挡的一块矩形区域。根据 LayoutParams.softInputMode 的取值选择与cf保持一致，或者选择cur区域。</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> dcf</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> sf</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> osf</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">computeFrameLw</span><span class="params">(Rect pf, Rect df, Rect of, Rect cf, Rect vf, Rect dcf, Rect sf,</span></span></span><br><span class="line"><span class="function"><span class="params">           Rect osf)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="布局后处理"><a href="#布局后处理" class="headerlink" title="布局后处理"></a>布局后处理</h3><h1 id="动画子系统"><a href="#动画子系统" class="headerlink" title="动画子系统"></a>动画子系统</h1>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/05/SELinux/" rel="next" title="SELinux">
+                <i class="fa fa-chevron-left"></i> SELinux
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="道墟" />
+            
+              <p class="site-author-name" itemprop="name">道墟</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">Artikel</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">Kategorien</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">Tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#修改窗口或者屏幕属性"><span class="nav-text">修改窗口或者屏幕属性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#relayoutWindow"><span class="nav-text">relayoutWindow</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参数列表分析"><span class="nav-text">参数列表分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码解析"><span class="nav-text">代码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#权限相关检查"><span class="nav-text">权限相关检查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#根据用户传入的参数更新windowState相关属性"><span class="nav-text">根据用户传入的参数更新windowState相关属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#根据window可见性更新或创建Surface及启动动画效果-todo-后续动画系统再研究这边"><span class="nav-text">根据window可见性更新或创建Surface及启动动画效果(todo 后续动画系统再研究这边)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#更新窗口焦点、壁纸可见性以及屏幕旋转"><span class="nav-text">更新窗口焦点、壁纸可见性以及屏幕旋转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#遍历所有的-DisplayContent-的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface"><span class="nav-text">遍历所有的 DisplayContent 的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#返回布局结果"><span class="nav-text">返回布局结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#向ams更新Configuration-因为屏幕可能旋转"><span class="nav-text">向ams更新Configuration 因为屏幕可能旋转</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#布局子系统"><span class="nav-text">布局子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#performLayoutAndPlaceSurfacesLocked"><span class="nav-text">performLayoutAndPlaceSurfacesLocked</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#performLayoutAndPlaceSurfacesLockedLoop"><span class="nav-text">performLayoutAndPlaceSurfacesLockedLoop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#performLayoutAndPlaceSurfacesLockedInner"><span class="nav-text">performLayoutAndPlaceSurfacesLockedInner</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主要逻辑"><span class="nav-text">主要逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#布局前的处理"><span class="nav-text">布局前的处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#布局-DisplayContent"><span class="nav-text">布局 DisplayContent</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#performLayoutLockedInner"><span class="nav-text">performLayoutLockedInner</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#PhoneWindowManager-的-beginLayoutLw-方法"><span class="nav-text">PhoneWindowManager 的 beginLayoutLw 方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PhoneWindowManager-的-layoutWindowLw-方法"><span class="nav-text">PhoneWindowManager 的 layoutWindowLw 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#WindowState-的-computeFrameLw-方法"><span class="nav-text">WindowState 的 computeFrameLw 方法</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#布局后处理"><span class="nav-text">布局后处理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#动画子系统"><span class="nav-text">动画子系统</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">道墟</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
