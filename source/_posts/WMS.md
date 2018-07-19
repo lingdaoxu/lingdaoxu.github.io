@@ -3,11 +3,10 @@ author: 道墟
 date: 2018-07-13 11:04:38
 tags:
 ---
-# 修改窗口或者屏幕属性
-## relayoutWindow 
+# 一. relayoutWindow 
 > 修改指定窗口的布局参数
 
-### 参数列表分析
+# 1.0 参数列表分析
 |参数| 释义|
 |------------ | ------------ |
 |Session session| 调用者所在进程的session示例|
@@ -27,8 +26,7 @@ tags:
 |Configuration outConfig| 重新布局后，wms为窗口计算出来的Configuration|
 |Surface outSurface| 用来接收分配的 Surface|
 
-### 代码解析
-#### 权限相关检查
+# 1.1 权限相关检查
 ```java
         ////Log.i(TAG, "relayoutWindow");
         boolean toBeDisplayed = false;
@@ -44,7 +42,7 @@ tags:
 
         long origId = Binder.clearCallingIdentity();
 ```
-#### 根据用户传入的参数更新windowState相关属性
+# 1.2 根据用户传入的参数更新windowState相关属性
 
 ```java
         //下面操作（一直到方法结束）是在锁住mWindowMap情况下完成的。在wms中，几乎所有的操作都是在锁住mWindowMap下完成的。
@@ -155,14 +153,13 @@ tags:
                         + " newVis=" + viewVisibility, stack);
             }
 ```
-#### 根据window可见性更新或创建Surface及启动动画效果(todo 后续动画系统再研究这边)
+# 1.3 根据window可见性更新或创建Surface及启动动画效果
+> 动画系统在下一篇里面具体介绍
+
 ```java
             
             if (viewVisibility == View.VISIBLE &&
                     (win.mAppToken == null || !win.mAppToken.clientHidden)) {
-
-                    
-
                 toBeDisplayed = !win.isVisibleLw();
                 if (win.mExiting) {
                     winAnimator.cancelExitAnimationForNextAnimationLocked();
@@ -299,7 +296,7 @@ tags:
                 if (DEBUG_VISIBILITY) Slog.i(TAG, "Releasing surface in: " + win);
             }
 ```
-#### 更新窗口焦点、壁纸可见性以及屏幕旋转
+# 1.4 更新窗口焦点、壁纸可见性以及屏幕旋转
 ```java
             if (focusMayChange) {
                 //System.out.println("Focus may change: " + win.mAttrs.getTitle());
@@ -336,7 +333,7 @@ tags:
             win.mGivenInsetsPending = (flags&WindowManagerGlobal.RELAYOUT_INSETS_PENDING) != 0;
             configChanged = updateOrientationFromAppTokensLocked(false);
 ```
-#### 遍历所有的 DisplayContent 的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface
+# 1.5 遍历所有的 DisplayContent 的所有窗口，为它们计算布局尺寸，并将布局尺寸设置给它们的surface（详细见第二节）
 ```java
             performLayoutAndPlaceSurfacesLocked();
 
@@ -350,7 +347,7 @@ tags:
             }
 ```
 
-#### 返回布局结果
+# 1.6 返回布局结果
 ```java
             outFrame.set(win.mCompatFrame);
             outOverscanInsets.set(win.mOverscanInsets);
@@ -379,15 +376,15 @@ tags:
         }
 ```
 
-#### 向ams更新Configuration 因为屏幕可能旋转
+# 1.7 向ams更新Configuration 因为屏幕可能旋转
 ```java
         if (configChanged) {
             sendNewConfiguration();
         }
 ```
 
-# 布局子系统
-## performLayoutAndPlaceSurfacesLocked
+# 二.布局子系统
+# 2.1 performLayoutAndPlaceSurfacesLocked
 
 ```java
     private final void performLayoutAndPlaceSurfacesLocked() {
@@ -402,9 +399,10 @@ tags:
     }
 ```
 performLayoutAndPlaceSurfacesLocked方法代码很短只有几行，但是在这之前我们需要搞清楚代码里面这个循环条件的含义，首先我们来关注下 **mTraversalScheduled** 变量，看看这个变量是做什么的：
+
 > mTraversalScheduled 在循环开始的会将值置成false，当值为true的时候才能继续循环，所以在 performLayoutAndPlaceSurfacesLockedLoop 肯定对值进行了重新赋值，下面我们跟着 performLayoutAndPlaceSurfacesLockedLoop来继续跟踪。
 
-## performLayoutAndPlaceSurfacesLockedLoop 
+# 2.2 performLayoutAndPlaceSurfacesLockedLoop 
 ```java
 private final void performLayoutAndPlaceSurfacesLockedLoop() {
         if (mInLayout) {
@@ -482,8 +480,9 @@ private final void performLayoutAndPlaceSurfacesLockedLoop() {
     }
 ```
 
-## performLayoutAndPlaceSurfacesLockedInner
-### 主要逻辑
+# 2.3 performLayoutAndPlaceSurfacesLockedInner(布局系统主要逻辑)
+
+# 2.3.0 主要逻辑
 ```
 布局前的预处理
 遍历所有 DisplayContent {
@@ -495,7 +494,9 @@ private final void performLayoutAndPlaceSurfacesLockedLoop() {
 }
 完成布局后的策略处理；
 ```
-### 布局前的处理
+
+
+# 2.3.1 布局前的处理
 ```java
     // "Something has changed!  Let's make it correct now."
     private final void performLayoutAndPlaceSurfacesLockedInner(boolean recoveringMemory) {
@@ -570,7 +571,7 @@ private final void performLayoutAndPlaceSurfacesLockedLoop() {
                 mEmulatorDisplayOverlay.positionSurface(defaultDw, defaultDh, mRotation);
             }
 ```
-### 布局 DisplayContent
+# 2.3.2 布局 DisplayContent
 ```java
             boolean focusDisplayed = false;
 
@@ -647,7 +648,7 @@ private final void performLayoutAndPlaceSurfacesLockedLoop() {
                     }
 
 ```
-#### performLayoutLockedInner
+# 2.3.2.1 performLayoutLockedInner
 
 ```java
     public final void performLayoutLockedInner(final DisplayContent displayContent,
@@ -842,7 +843,7 @@ private final void performLayoutAndPlaceSurfacesLockedLoop() {
     }
 ```
 
-##### PhoneWindowManager 的 beginLayoutLw 方法
+# 2.3.2.1.1 PhoneWindowManager 的 beginLayoutLw 方法
 这个方法为布局准备了一些用到的参数，这些参数描述了屏幕上的8个矩形区域，这8个区域构成了 PhoneWindowManager 布局窗口的准绳。
 - 描述整个屏幕的逻辑显示区域
 	- mUnrestrictedScreenLeft
@@ -1238,7 +1239,7 @@ WINDOW MANAGER POLICY STATE (dumpsys window policy)
         }
     }
 ```
-##### PhoneWindowManager 的 layoutWindowLw 方法
+# 2.3.2.1.2 PhoneWindowManager 的 layoutWindowLw 方法
 layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和尺寸。
 
 ```java
@@ -1295,7 +1296,7 @@ layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和�
     }
 ```
 
-###### WindowState 的 computeFrameLw 方法
+# 2.3.2.1.2.1 WindowState 的 computeFrameLw 方法
 
 该方法的产出
 - mFrame:描述窗口的位置和尺寸
@@ -1327,7 +1328,7 @@ layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和�
 ```
 
 
-### 检查布局结果
+# 2.3.3 检查布局结果
 
 这一步主要是对一些flag的上的处理
 - FLAG_FORCE_NOT_FULLSCREEN:必须同时显示状态栏等系统窗口
@@ -1398,7 +1399,7 @@ layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和�
           } while (displayContent.pendingLayoutChanges != 0);
 ```
 
-#### beginPostLayoutPolicyLw：初始化参数
+# 2.3.3.1 beginPostLayoutPolicyLw：初始化参数
 ```java
     /** {@inheritDoc} */
     @Override
@@ -1430,7 +1431,7 @@ layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和�
     }
 ```
 
-#### applyPostLayoutPolicyLw：设置参数
+# 2.3.3.2 applyPostLayoutPolicyLw：设置参数
 
 方法输出
 - mTopFullscreenOpaqueWindowState:首个满屏窗口
@@ -1558,7 +1559,7 @@ layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和�
     }
 ```
 
-#### finishPostLayoutPolicyLw：调教系统窗口与锁屏界面的可见性
+# 2.3.3.3 finishPostLayoutPolicyLw：调教系统窗口与锁屏界面的可见性
 
 ```java
     public int finishPostLayoutPolicyLw() {
@@ -1711,7 +1712,7 @@ layoutWindowLw 使用上面那些布局参数来确定一个窗口的位置和�
         return changes;
     }
 ```
-### 布局后处理
+# 2.3.4 布局后处理
 为布局好的窗口设置Surface大小和位置，并附加动画效果等。
 
 主要工作内容:
